@@ -1,0 +1,14 @@
+label{
+	float:left;
+	display:inline-block;
+	width:100px;
+	text-align:left;
+	font-family:Georgia;
+	font-size:14px;
+	font-weight:bold;
+}
+fieldset{
+	font-family: Georgia;
+	font-size:16px;
+}
+
