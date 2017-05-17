@@ -16,25 +16,36 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class SupplierController {
 	private static final Log logger = LogFactory.getLog(SupplierController.class);
 	
-	@RequestMapping(value="/new",method=RequestMethod.GET)
+	@RequestMapping(value="/input",method=RequestMethod.GET)
 	public String inputFurnizor(Model model){
 		logger.info("Create supplier called");
 		model.addAttribute("supplier",new Supplier());
 		return "SupplierForm";
 	}
 	
-	@RequestMapping(value="/add", method=RequestMethod.POST)
-	public String add(Model model){
+	@RequestMapping(value="/", method=RequestMethod.POST)
+	public String saveSupplier(Model model){
 		return "SupplierDetails";
 	}
 	
-	@RequestMapping(value="/get",method=RequestMethod.GET)
-	public String getFurnizor(HttpSession session){
+	@RequestMapping(value="/id",method=RequestMethod.GET)
+	public String getSupplier(HttpSession session){
 		return "";
 	}
 	
-	@RequestMapping(value="/get-by-filter",method=RequestMethod.GET)
-	public String getFurnizori(HttpSession session){
+	@RequestMapping(value="/filter",method=RequestMethod.GET)
+	public String filterSuppliers(HttpSession session){
 		return "";
 	}
+	
+	@RequestMapping(value="/id",method=RequestMethod.DELETE)
+	public String deleteSupplier(HttpSession session){
+		return "";
+	}
+	
+	@RequestMapping(value="/id",method=RequestMethod.PUT)
+	public String modifySupplier(HttpSession session){
+		return "";
+	}
+	
 }
