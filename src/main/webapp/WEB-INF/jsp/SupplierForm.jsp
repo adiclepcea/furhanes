@@ -16,7 +16,7 @@
 </head>
 <body>
 	<div id="global" class="container">
-		<form action="." method="POST" class="form-horizontal form">			
+		<form action=${supplier.id==0?"\".\"":"\"${supplier.id}\""} method=${supplier.id==0?"\"POST\"":"\"PUT\""} class="form-horizontal form">			
 			<fieldset>				
 				<legend>${supplier.id==0?"Add a supplier":"Edit the supplier"}</legend>				
 				<input type="hidden" id="id" name="id" value="${supplier.id }"/>				
@@ -33,7 +33,7 @@
 						</div>
 						<label class="control-label col-xs-2" for="j">J:</label>
 						<div class="col-xs-4">
-							<input type="TEXT" id="j" name="j" value="${supplier.j}" class="form-control" placeholder="J"/>
+							<input type="TEXT" id="j" name="j" value="${supplier.j}" class="form-control" placeholder="Nr. Reg. Com."/>
 						</div>
 				</div>
 				
