@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/login")
-public class LoginController {
+public class LoginController{
 	@RequestMapping("/")
 	public String Login(Model model,@RequestParam(value="error",required=false) String error){
 		if(error!=null){

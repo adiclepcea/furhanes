@@ -12,6 +12,7 @@
 	http://www.springframework.org/schema/context/spring-context.xsd">
  
  	<context:property-placeholder location="classpath:app.properties"/>
+ 	<beans:bean id="AuthenticationFailureHandlerImpl" class="org.clepcea.controllers.AuthenticationFailureHandlerImpl"/>
      <http auto-config="true" use-expressions="true">        
      	<intercept-url pattern="/" access="hasRole('ROLE_RIGHT_HOME')"/>
         <intercept-url pattern="/suppliers/*" access="hasRole('ROLE_RIGHT_SUPPLIERS')" />
@@ -19,7 +20,7 @@
         <intercept-url pattern="/receptions/*" access="hasRole('ROLE_RIGHT_RECEPTIONS')" />
         <intercept-url pattern="/STOCK/*" access="hasRole('ROLE_RIGHT_STOCK')" />
         <security:logout logout-url="/furhanes-logout" delete-cookies="JSESSIONID" logout-success-url="/" invalidate-session="true"/>
-        <form-login login-page="/login/" default-target-url="/" />
+        <form-login login-page="/login/" default-target-url="/" authentication-failure-handler-ref="AuthenticationFailureHandlerImpl"/>
     </http>
  	   
  	<global-method-security pre-post-annotations="enabled"/>
