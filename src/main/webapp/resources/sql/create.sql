@@ -210,3 +210,91 @@ SET TERM ; !!
 
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON SUPPLIERS TO roskofur;
+
+--contracts
+CREATE TABLE contracts
+(
+    id integer not null,
+    suppliers_id integer not null,
+    cotract_date date,
+    internal_number integer,
+    expiration_date date,
+    undefinite smallint default 0,
+    contract_object varchar(300),
+    contact_person integer,
+    filed varchar(50),
+    payment_term integer,
+    scan_file varchar(1000),
+    observations varchar(500),
+    CONSTRAINT pk_contracts 
+        PRIMARY KEY (id),
+    constraint fk_suppliers_contracts
+        FOREIGN KEY (SUPPLIERS_ID) REFERENCES SUPPLIERS (ID)
+
+);
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON CONTRACTS TO roskofur;
+
+CREATE GENERATOR GEN_CONTRACTS_ID;
+
+SET TERM !! ;
+CREATE TRIGGER CONTRACTS_BI FOR CONTRACTS
+ACTIVE BEFORE INSERT POSITION 0
+AS
+DECLARE VARIABLE tmp DECIMAL(18,0);
+BEGIN
+  IF (NEW.ID IS NULL) THEN
+    NEW.ID = GEN_ID(GEN_CONTRACTS_ID, 1);
+  ELSE
+  BEGIN
+    tmp = GEN_ID(GEN_CONTRACTS_ID, 0);
+    if (tmp < new.ID) then
+      tmp = GEN_ID(GEN_CONTRACTS_ID, new.ID-tmp);
+  END
+END!!
+SET TERM ; !!
+
+--contacts
+CREATE TABLE contacts
+(
+    ID integer not null,
+    NAME varchar(200),
+    SURNAME varchar(250),
+    TITLE varchar(20),
+    CONACT_FUNCTION varchar(200),
+    MAIL varchar(400),
+    FAX varchar(200),
+    PHONE varchar(200),
+    MOBILE_PHONE varchar(200),
+    OBSERVATIONS varchar(500),
+    SUPPLIERS_ID integer not null,
+    
+    CONSTRAINT PK_CONTACTS
+        PRIMARY KEY (ID),
+    constraint FK_SUPPLIERS_CONTACTS
+        FOREIGN KEY (SUPPLIERS_ID) REFERENCES SUPPLIERS (ID)
+        
+);
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON CONTACTS TO roskofur;
+
+CREATE GENERATOR GEN_CONTACTS_ID;
+
+SET TERM !! ;
+CREATE TRIGGER CONTACTS_BI FOR CONTACTS
+ACTIVE BEFORE INSERT POSITION 0
+AS
+DECLARE VARIABLE tmp DECIMAL(18,0);
+BEGIN
+  IF (NEW.ID IS NULL) THEN
+    NEW.ID = GEN_ID(GEN_CONTACTS_ID, 1);
+  ELSE
+  BEGIN
+    tmp = GEN_ID(GEN_CONTACTS_ID, 0);
+    if (tmp < new.ID) then
+      tmp = GEN_ID(GEN_CONTACTS_ID, new.ID-tmp);
+  END
+END!!
+SET TERM ; !!
+
+
