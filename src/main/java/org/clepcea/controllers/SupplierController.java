@@ -1,33 +1,54 @@
 package org.clepcea.controllers;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.clepcea.model.Supplier;
+import org.clepcea.services.SupplierService;
+import org.clepcea.services.SupplierServiceImpl;
 import org.omg.CORBA.Request;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value="/suppliers")
 public class SupplierController {
 	private static final Log logger = LogFactory.getLog(SupplierController.class);
-	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W')")
+	
+	@Autowired
+	private SupplierService supplierService;
+	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS')")
 	@RequestMapping(value="/input",method=RequestMethod.GET)
-	public String inputFurnizor(Model model){
-		logger.info("Create supplier called");
-		model.addAttribute("supplier",new Supplier());
+	public String inputFurnizor(Model model,HttpSession session,@RequestParam(value="id", required=false) Long id){
+		logger.info("Input supplier called");
+		Supplier supplier;
+		if(id!=null){
+			supplier = supplierService.getSupplierById(id);
+		}else{
+			supplier = new Supplier();
+		}
+		model.addAttribute("supplier",supplier);
 		return "SupplierForm";
 	}
 		
-	@RequestMapping(value="/", method=RequestMethod.POST)
-	public String saveSupplier(Model model){
+	@RequestMapping(value="/", method=RequestMethod.POST, consumes="application/json",produces="application/json")
+	@ResponseBody
+	public String saveSupplier(@RequestBody Supplier supplier){
+		logger.info("Create supplier called");
 		return "SupplierDetails";
 	}
 	
@@ -37,7 +58,8 @@ public class SupplierController {
 	}
 	
 	@RequestMapping(value="/list",method=RequestMethod.GET)
-	public String filterSuppliers(HttpSession session){
+	public String filterSuppliers(ModelMap model){
+		model.addAttribute("suppliers", supplierService.listSuppliers(0, 10, null));
 		return "SupplierList";
 	}
 	
@@ -47,8 +69,11 @@ public class SupplierController {
 	}
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.PUT)
-	public String modifySupplier(HttpSession session, @PathVariable long id){
-		return "";
+	@ResponseBody
+	public Supplier modifySupplier(@RequestBody Supplier supplier, @PathVariable long id){
+		logger.info("Modify supplier called");
+		supplierService.saveSupplier(supplier);
+		return supplier;
 	}
 	
 }

@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -10,6 +10,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link type="text/css" rel="stylesheet" href="<spring:url value='/resources/css/bootstrap.min.css'/>" />
+    <link type="text/css" rel="stylesheet" href="<spring:url value='/resources/css/main.css'/>" />
     <script src="<spring:url value='/resources/js/jquery-3.2.1.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/bootstrap.min.js'/>" ></script>
     
@@ -51,18 +52,25 @@
 	    </div>
 	  </div>
 	</nav>
+	
+	<div id="container" class="container-fluid">
+	
 		
-	<div id="container" class="container">
-	
 	</div>
-	
+	<div class="">
+		<ul class="pager">
+			<li><a href="#">Previous</a></li>
+			<li><a href="#">Next</a></li>
+		</ul>
+	</div>
 	<form id="f-logout" action="${logoutUrl}" method="post">
-	  <input type="hidden"
+	  <input type="hidden" id="csrf"
 		name="${_csrf.parameterName}"
 		value="${_csrf.token}" />
 	</form>
+	
 	<script type="text/javascript">
-		function showSuppliersList(){
+		function showSuppliersList(){			
 			$.ajax({
 				url:"suppliers/list",
 				error:function(err){
@@ -78,10 +86,60 @@
 				$(".menu-item").removeClass("active");
 				$("#mnuSuppliers").addClass("active");
 			});
+			
 		}
 		
 		function logout(){
 			$("#f-logout").submit();
+		}
+		
+		function populateSupplierEdit(id){
+			//if the element is not shown yet, then populate it
+			if(!$("#edit_"+id).is(":visible")){
+				$("#supplier_edit_"+id).html("<img src="+"<spring:url value='/resources/images/Loading_icon.gif'/>"+"/>");
+				$.ajax({
+					url:"suppliers/input?id="+id,
+					error:function(err){
+						alert("Error requesting supplier data:\r\n"+err);
+					},
+					success:function(data){
+						$("#supplier_edit_"+id).html(data);
+					}
+				});
+			}
+		}
+		function saveSupplier(){
+			
+			var supplier={};
+			supplier.id = $("#supplier_id").val();
+			supplier.name = $("#supplier_name").val();
+			supplier.address = $("#supplier_address").val();
+			supplier.cui = $("#supplier_cui").val();
+			supplier.j = $("#supplier_j").val();
+			supplier.mail = $("#supplier_mail").val();
+			supplier.fax = $("#supplier_fax").val();
+			supplier.iban = $("#supplier_iban").val();
+			supplier.bank = $("#supplier_bank").val();
+			supplier.swift = $("#supplier_swift").val();
+			supplier.phone = $("#supplier_phone").val();
+			alert(JSON.stringify(supplier));
+			$.ajax({
+				url:("suppliers/"+((supplier.id==0)?"":supplier.id)),
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				type: ((supplier.id==0)?"POST":"PUT"),
+				contentType: "application/json; charset=utf-8",
+				data:JSON.stringify(supplier),
+				
+				cache:false,
+				processData:false,				
+				error:function(err){
+					console.log(err);
+					alert("Error saving supplier:\r\n"+JSON.stringify(err));
+				},
+				success:function(data){
+					alert(JSON.stringify(data));
+				}
+			});
 		}
 		
 	</script>

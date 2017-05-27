@@ -1,7 +1,7 @@
 package org.clepcea.model;
 
 public class Supplier {
-	private String name, cui, address,j,bank,iban,swift,bic,phone,fax,mail;
+	private String name, cui, address,j,bank,iban,swift,phone,fax,mail;
 	public String getBank() {
 		return bank;
 	}
@@ -24,14 +24,6 @@ public class Supplier {
 
 	public void setSwift(String swift) {
 		this.swift = swift;
-	}
-
-	public String getBic() {
-		return bic;
-	}
-
-	public void setBic(String bic) {
-		this.bic = bic;
 	}
 
 	public String getPhone() {
