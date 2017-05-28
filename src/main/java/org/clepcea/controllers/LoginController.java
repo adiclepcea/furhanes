@@ -16,6 +16,7 @@ public class LoginController{
 		if(error!=null){
 			model.addAttribute("error",error==""?"Invalid credentials supplied":error);
 		}		
+		
 		return "LoginForm";
 	}
 }

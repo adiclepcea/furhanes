@@ -1,6 +1,5 @@
 package org.clepcea.controllers;
 
-import java.util.Arrays;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -9,10 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.clepcea.model.Supplier;
 import org.clepcea.services.SupplierService;
-import org.clepcea.services.SupplierServiceImpl;
-import org.omg.CORBA.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,8 +56,18 @@ public class SupplierController {
 	}
 	
 	@RequestMapping(value="/list",method=RequestMethod.GET)
-	public String filterSuppliers(ModelMap model){
-		model.addAttribute("suppliers", supplierService.listSuppliers(0, 10, null));
+	public String filterSuppliers(ModelMap model,
+			@RequestParam(value="startFrom",  required=false) Integer startFrom,
+			@RequestParam(value="count",  required=false) Integer count){
+		
+		if(startFrom==null){
+			startFrom = 0;
+		}
+		if(count==null){
+			count = 0;
+		}
+		logger.info("list suppliers called "+startFrom+", count="+count);
+		model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null));
 		return "SupplierList";
 	}
 	

@@ -1,17 +1,20 @@
 package org.clepcea.services;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
+import org.clepcea.dao.SupplierDao;
 import org.clepcea.model.Supplier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SupplierServiceImpl implements SupplierService{
 	private ArrayList<Supplier> suppliers = new ArrayList<Supplier>();
+	
+	@Autowired
+	private SupplierDao supplierDao;
 	
 	public SupplierServiceImpl(){
 		Supplier s1 = new Supplier();
@@ -53,32 +56,22 @@ public class SupplierServiceImpl implements SupplierService{
 	}
 	@Override
 	public void saveSupplier(Supplier supplier) {
-		Supplier snow = suppliers.stream().filter(s->s.getId()==supplier.getId()).findFirst().orElse(null);
-		if(snow!=null){
-			suppliers.remove(snow);
-		}
-		if(supplier.getId()==0){
-			Supplier smax = suppliers.stream().max((s1,s2)->{return new Integer(s1.getId()).compareTo(new Integer(s2.getId()));}).orElse(null);
-			supplier.setId(smax.getId()+1);
-		}
-		suppliers.add(supplier);
-		
+		supplierDao.save(supplier);
 	}
 
 	@Override
-	public List<Supplier> listSuppliers(long fromId, int count, HashMap<String, Object> filter) {
-		
-		return suppliers;
+	public List<Supplier> listSuppliers(int start, int count, HashMap<String, Object> filter) {
+		return supplierDao.list(start,count);
 	}
 
 	@Override
 	public void deleteSupplierById(long id) {
-		suppliers.removeIf(s->s.getId()==id);		
+		supplierDao.deleteById(id);
 	}
 
 	@Override
 	public Supplier getSupplierById(long id) {
-		return suppliers.stream().filter(s->s.getId()==id).findAny().get();
+		return supplierDao.getById(id);
 	}
 
 }

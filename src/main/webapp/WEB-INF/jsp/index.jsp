@@ -65,7 +65,8 @@
 	</form>
 	
 	<script type="text/javascript">
-		
+		var startPositionSupplier = 0;
+		var countPositionsSupplier = 3;
 		
 		function logout(){
 			$("#f-logout").submit();
@@ -88,9 +89,19 @@
 			}
 		}
 		
+		function incrementSupplierPos(){
+			startPositionSupplier+=countPositionsSupplier;
+			showSuppliersList();
+		}
+		
+		function decrementSupplierPos(){			
+			startPositionSupplier-=countPositionsSupplier;
+			startPositionSupplier = Math.max(0,startPositionSupplier);
+			showSuppliersList();
+		}
 		function showSuppliersList(){			
 			$.ajax({
-				url:"suppliers/list",
+				url:"suppliers/list?startFrom="+startPositionSupplier+"&count="+countPositionsSupplier,
 				error:function(err){
 					if(err.hasOwnProperty("status") && err.status==403 ||err.status==401){
 						window.location.replace(".");//"${loginUrl}?error=Please%20login%20to%20access%20this%20area");

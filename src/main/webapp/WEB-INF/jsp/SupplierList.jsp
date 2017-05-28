@@ -57,8 +57,8 @@
 	</c:forEach>
 	<div class="">
 		<ul class="pager">
-			<li><a href="#">Previous</a></li>
-			<li><a href="#">Next</a></li>
+			<li><a href="#" onclick="decrementSupplierPos()">Previous</a></li>
+			<li><a href="#" onclick="incrementSupplierPos()">Next</a></li>
 		</ul>
 	</div>
 	

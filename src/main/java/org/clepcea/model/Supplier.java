@@ -1,7 +1,22 @@
 package org.clepcea.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="SUPPLIERS")
 public class Supplier {
+	@Id
+	@Column(name="id")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private long id;
+	
 	private String name, cui, address,j,bank,iban,swift,phone,fax,mail;
+	
 	public String getBank() {
 		return bank;
 	}
@@ -58,13 +73,12 @@ public class Supplier {
 		this.j = j;
 	}
 
-	private int id;
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
