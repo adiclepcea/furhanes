@@ -15,17 +15,18 @@
 
 </head>
 <body>
-	<div id="global" class="container-fluid">
+	<div id="supplier_form_${supplier.id }" class="container-fluid form-signin">
 		<!-- <form action=${supplier.id==0?"\"/furhanes/suppliers/\"":"\"/furhanes/suppliers/\"${supplier.id}"} method=${supplier.id==0?"\"POST\"":"\"PUT\""}>  -->			
 			<fieldset>				
 				<legend>${supplier.id==0?"Add a supplier":""}</legend>				
 				<input type="hidden" id="supplier_id" name="id" value="${supplier.id }"/>
-				<div class="row">				
+				<div class="row">	
+					<div class="form-group" id="supplier_name_group">			
 					<label class="control-label col-sm-1" for="name">Name:</label>
 					<div class="col-sm-5">
 						<input type="TEXT" id="supplier_name" name="name" value="${supplier.name}" class="form-control col-sm-12" placeholder="Name of the supplier"/>
 					</div>				
-					
+					</div>
 					<label class="control-label col-sm-1" for="cui">CUI:</label>
 					<div class=col-sm-2>
 						<input type="TEXT" id="supplier_cui" name="cui" value="${supplier.cui}" class="form-control col-sm-12" placeholder="CUI"/>
@@ -74,9 +75,15 @@
 						<input type="TEXT" id="supplier_iban" name="iban" value="${supplier.iban}" class="form-control col-sm-12" placeholder="IBAN code"/>
 					</div>	
 				</div>
-				<div><button class="btn btn-md btn-success alignright" onclick="saveSupplier()">Save</button></div>
+				<div>
+				<div class="alert alert-info" id="supplier_msg_${supplier.id}">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<span id="supplier_msg_data_${supplier.id }">You are editing a supplier</span> 
+				</div>
+				<button class="btn btn-md btn-success alignright" onclick="saveSupplier(${supplier.id })">Save</button></div>
 				
 			</fieldset>
+			
 		<!-- </form>  -->
 	</div>
 

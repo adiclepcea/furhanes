@@ -57,12 +57,7 @@
 	
 		
 	</div>
-	<div class="">
-		<ul class="pager">
-			<li><a href="#">Previous</a></li>
-			<li><a href="#">Next</a></li>
-		</ul>
-	</div>
+	
 	<form id="f-logout" action="${logoutUrl}" method="post">
 	  <input type="hidden" id="csrf"
 		name="${_csrf.parameterName}"
@@ -70,15 +65,38 @@
 	</form>
 	
 	<script type="text/javascript">
+		
+		
+		function logout(){
+			$("#f-logout").submit();
+		}
+		
+		function showError(element,message){
+			$("#"+element).html("<div class='alert alert-danger'>"+message+"</div>");
+		}
+		
+		function processError(element,err){
+			switch(err.status){
+			case 401:
+				showError(element,"You need to relogin!");
+				break;
+			case 403:
+				showError(element,"You do not have access here. Please login with other credentials that have access here.!");
+				break;
+			default:
+				showError(element,"Response status: "+err.status);							
+			}
+		}
+		
 		function showSuppliersList(){			
 			$.ajax({
 				url:"suppliers/list",
 				error:function(err){
-					if(err.status==403){
-						window.location.replace("${loginUrl}?error=Please%20login%20to%20access%20this%20area");
+					if(err.hasOwnProperty("status") && err.status==403 ||err.status==401){
+						window.location.replace(".");//"${loginUrl}?error=Please%20login%20to%20access%20this%20area");
 					}
 					else{
-						alert(JSON.stringify(err));
+						processError("container",err);
 					}
 				}
 			}).done(function(data){
@@ -89,40 +107,48 @@
 			
 		}
 		
-		function logout(){
-			$("#f-logout").submit();
-		}
-		
 		function populateSupplierEdit(id){
 			//if the element is not shown yet, then populate it
-			if(!$("#edit_"+id).is(":visible")){
+			if(!$("#supplier_edit_"+id).is(":visible")){
 				$("#supplier_edit_"+id).html("<img src="+"<spring:url value='/resources/images/Loading_icon.gif'/>"+"/>");
 				$.ajax({
 					url:"suppliers/input?id="+id,
 					error:function(err){
-						alert("Error requesting supplier data:\r\n"+err);
+						if(err.hasOwnProperty("status")){
+							processError("supplier_edit_"+id,err);				
+						}else{
+							alert("Error requesting supplier data:\r\n"+err);
+						}
 					},
-					success:function(data){
+					success:function(data,  textStatus,  xhr){						
 						$("#supplier_edit_"+id).html(data);
+						$("#supplier_msg_"+id).hide();
 					}
 				});
 			}
 		}
-		function saveSupplier(){
-			
+		function saveSupplier(id){
+			$("#supplier_form_"+id+" #supplier_name_group").removeClass("has-error");
 			var supplier={};
-			supplier.id = $("#supplier_id").val();
-			supplier.name = $("#supplier_name").val();
-			supplier.address = $("#supplier_address").val();
-			supplier.cui = $("#supplier_cui").val();
-			supplier.j = $("#supplier_j").val();
-			supplier.mail = $("#supplier_mail").val();
-			supplier.fax = $("#supplier_fax").val();
-			supplier.iban = $("#supplier_iban").val();
-			supplier.bank = $("#supplier_bank").val();
-			supplier.swift = $("#supplier_swift").val();
-			supplier.phone = $("#supplier_phone").val();
-			alert(JSON.stringify(supplier));
+			supplier.id = $("#supplier_form_"+id+" #supplier_id").val();
+			supplier.name = $("#supplier_form_"+id+" #supplier_name").val();
+			supplier.address = $("#supplier_form_"+id+" #supplier_address").val();
+			supplier.cui = $("#supplier_form_"+id+" #supplier_cui").val();
+			supplier.j = $("#supplier_form_"+id+" #supplier_j").val();
+			supplier.mail = $("#supplier_form_"+id+" #supplier_mail").val();
+			supplier.fax = $("#supplier_form_"+id+" #supplier_fax").val();
+			supplier.iban = $("#supplier_form_"+id+" #supplier_iban").val();
+			supplier.bank = $("#supplier_form_"+id+" #supplier_bank").val();
+			supplier.swift = $("#supplier_form_"+id+" #supplier_swift").val();
+			supplier.phone = $("#supplier_form_"+id+" #supplier_phone").val();
+			
+			if(supplier.name==""){
+				$("#supplier_form_"+id+" #supplier_name_group").addClass("has-error");
+				return;
+			}
+			
+			console.log("Saving: "+JSON.stringify(supplier));
+			
 			$.ajax({
 				url:("suppliers/"+((supplier.id==0)?"":supplier.id)),
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
@@ -133,13 +159,91 @@
 				cache:false,
 				processData:false,				
 				error:function(err){
-					console.log(err);
-					alert("Error saving supplier:\r\n"+JSON.stringify(err));
+					$("#supplier_msg_"+supplier.id).attr("class","alert alert-danger");
+					if(err.hasOwnProperty("status")){						
+						$("#supplier_msg_data_"+supplier.id).html("<strong>Error saving supplier</strong>: "+JSON.stringify(err));
+					}else{
+						$("#supplier_msg_data_"+supplier.id).html("<strong>Error saving supplier</strong>: "+err);	
+					}
+					$("#supplier_msg_"+supplier.id).show();
 				},
 				success:function(data){
-					alert(JSON.stringify(data));
+					redrawSupplier(data);
+					//$("#supplier_header_"+supplier.id).click();
+					$("#supplier_msg_"+supplier.id).attr("class","alert alert-success");
+					$("#supplier_msg_data_"+supplier.id).html("Supplier <strong>"+supplier.name+"</strong> was saved!");
+					$("#supplier_msg_"+supplier.id).show();
 				}
 			});
+		}
+		
+		function redrawSupplier(supplier){
+			if(document.getElementById("supplier_header_"+supplier.id)!=null){
+				
+				$("#supplier_header_"+supplier.id).html(supplier.name);
+				$("#supplier_details_"+supplier.id).html("<strong>CUI</strong>: "+supplier.cui + 
+				", <strong>Phone</strong>: "+ supplier.phone + 
+				", <strong>Fax</strong>: "+supplier.fax + 
+				", <strong>E-Mail</strong>: "+ supplier.mail +
+				", <strong>SWIFT</strong>: "+ supplier.swift + 
+				", <strong>Address</strong>: "+ supplier.address);
+				
+			}
+		}
+		
+		function addSupplier(){
+			if(!$("#supplierAddDiv").is(":visible")){
+				$("#supplierAddDiv").show();
+				$("#btnAddSupplier").hide();
+				$("#btnCancelAddSupplier").show();
+				$("#suppliersList").hide();
+				$.ajax({
+					url:"suppliers/input",
+					error:function(err){
+						if(err.hasOwnProperty("status")){
+							processError("#supplierAddDiv",err);				
+						}else{
+							alert("Error requesting supplier data:\r\n"+err);
+						}
+					},
+					success:function(data,  textStatus,  xhr){						
+						$("#supplierAddDiv").html(data);
+						$("#supplier_msg_0").hide();
+					}
+				});
+			}
+		}
+		
+		function closeAddSupplier(){
+			$("#supplierAddDiv").hide();
+			$("#btnAddSupplier").show();
+			$("#btnCancelAddSupplier").hide();
+			$("#suppliersList").show();
+		}
+		
+		function deleteSupplier(id,name){
+			if(confirm("Are you sure you want to delete the selected supplier?")){
+				$.ajax({
+					url:"suppliers/"+id,
+					type:"DELETE",
+					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+					error:function(err){
+						if(err.hasOwnProperty("status") ){
+							if(err.status==401){
+								window.location.replace(".");
+								return;
+							}else if(err.status==403){
+								alert("You are not authorized to delete suppliers!");
+								return;
+							}
+						}
+						alert(err);
+					},
+					success: function(data,textStatus,xhr){
+						showSuppliersList();
+					}
+				});
+			}
 		}
 		
 	</script>

@@ -2,6 +2,7 @@ package org.clepcea.controllers;
 
 import java.util.Arrays;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -47,9 +48,10 @@ public class SupplierController {
 		
 	@RequestMapping(value="/", method=RequestMethod.POST, consumes="application/json",produces="application/json")
 	@ResponseBody
-	public String saveSupplier(@RequestBody Supplier supplier){
+	public Supplier saveSupplier(@RequestBody Supplier supplier){
 		logger.info("Create supplier called");
-		return "SupplierDetails";
+		supplierService.saveSupplier(supplier);
+		return supplier;
 	}
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
@@ -64,8 +66,11 @@ public class SupplierController {
 	}
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.DELETE)
-	public String deleteSupplier(HttpSession session,@PathVariable long id){
-		return "";
+	public Object deleteSupplier(@PathVariable long id,HttpServletResponse response){
+		logger.info("Delete supplier called");
+		supplierService.deleteSupplierById(id);
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		return null;
 	}
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.PUT)

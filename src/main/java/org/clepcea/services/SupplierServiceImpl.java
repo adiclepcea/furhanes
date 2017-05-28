@@ -1,8 +1,10 @@
 package org.clepcea.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.clepcea.model.Supplier;
 import org.springframework.stereotype.Service;
@@ -51,9 +53,13 @@ public class SupplierServiceImpl implements SupplierService{
 	}
 	@Override
 	public void saveSupplier(Supplier supplier) {
-		Supplier snow = suppliers.stream().filter(s->s.getId()==supplier.getId()).findFirst().get();
+		Supplier snow = suppliers.stream().filter(s->s.getId()==supplier.getId()).findFirst().orElse(null);
 		if(snow!=null){
 			suppliers.remove(snow);
+		}
+		if(supplier.getId()==0){
+			Supplier smax = suppliers.stream().max((s1,s2)->{return new Integer(s1.getId()).compareTo(new Integer(s2.getId()));}).orElse(null);
+			supplier.setId(smax.getId()+1);
 		}
 		suppliers.add(supplier);
 		
