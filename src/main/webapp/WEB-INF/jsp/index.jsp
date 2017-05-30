@@ -99,6 +99,7 @@
 			startPositionSupplier = Math.max(0,startPositionSupplier);
 			showSuppliersList();
 		}
+		
 		function showSuppliersList(){			
 			$.ajax({
 				url:"suppliers/list?startFrom="+startPositionSupplier+"&count="+countPositionsSupplier,
@@ -247,6 +248,7 @@
 								alert("You are not authorized to delete suppliers!");
 								return;
 							}
+							alert(JSON.stringify(err));
 						}
 						alert(err);
 					},
@@ -255,6 +257,101 @@
 					}
 				});
 			}
+		}
+		
+		function showContactList(id){
+			$.ajax({
+				url:"suppliers/"+id+"/contacts",
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contacts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					$("#supplier_contacts_"+id).html(data);	
+					$("#supplier_no_of_contacts_"+id).text($("#supplier_contacts_"+id+" #no_of_contacts").val());
+				}
+			});
+		}
+		
+		function addContactToSupplier(id){
+			var contact={};
+			contact.name=$("#supplier_contacts_"+id+" #contact_new_name").val();
+			contact.surname=$("#supplier_contacts_"+id+" #contact_new_surname").val();
+			contact.title=$("#supplier_contacts_"+id+" #contact_new_title").val();
+			contact.mail=$("#supplier_contacts_"+id+" #contact_new_mail").val();
+			contact.fax=$("#supplier_contacts_"+id+" #contact_new_fax").val();
+			contact.phone=$("#supplier_contacts_"+id+" #contact_new_phone").val();
+			contact.observations=$("#supplier_contacts_"+id+" #contact_new_observations").val();
+			contact.contactFunction=$("#supplier_contacts_"+id+" #contact_new_function").val();
+			contact.mobilePhone=$("#supplier_contacts_"+id+" #contact_new_mobile").val();
+			alert(JSON.stringify(contact));
+			
+			$.ajax({
+				url:"suppliers/"+id+"/contacts",
+				type: "POST",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				type: "POST",
+				contentType: "application/json; charset=utf-8",
+				data:JSON.stringify(contact),
+				cache:false,
+				processData:false,
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to add contacts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert("Error:\r\n"+err);
+				},
+				success: function(data,textStatus,xhr){
+					alert("data:"+xhr.status);			
+					showContactList(id);
+				} 
+			});
+		} 
+		
+		
+		function deleteContact(id,supplier_id){
+			if(!confirm("Are you sure you want to delete the selected contact?")){
+				return;
+			}
+			ajax({
+				url:"contacts/"+id,
+				type: "DELETE",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							window.location.replace(".");
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to delete contacts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					showContactList(supplier_id);
+				}
+			});
 		}
 		
 	</script>

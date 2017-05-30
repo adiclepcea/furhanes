@@ -261,7 +261,7 @@ CREATE TABLE contacts
     NAME varchar(200),
     SURNAME varchar(250),
     TITLE varchar(20),
-    CONACT_FUNCTION varchar(200),
+    CONTACT_FUNCTION varchar(200),
     MAIL varchar(400),
     FAX varchar(200),
     PHONE varchar(200),

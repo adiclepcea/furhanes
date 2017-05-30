@@ -2,6 +2,7 @@ package org.clepcea.dao;
 
 import java.util.List;
 
+import org.clepcea.model.Contact;
 import org.clepcea.model.Supplier;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -68,6 +69,28 @@ public class SupplierDaoImpl implements SupplierDao {
 		Supplier supplier = (Supplier)query.uniqueResult(); 
 		session.close();
 		return supplier;
+	}
+	@Override
+	public List<Contact> contactListBySupplierId(long id) {
+		Session session = sessionFactory.openSession();
+		Query query = session.createQuery("from Supplier where id=:id");
+		query.setParameter("id", id);	
+		Supplier supplier = (Supplier)query.uniqueResult();
+		List<Contact> contacts = supplier.getContacts();
+		session.close();
+		return contacts;
+	}
+	@Override
+	public void addContactToSupplierId(long id,Contact contact) {
+		System.out.println("addContactToSupplierCalled");
+		Session session = sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		Supplier supplier = (Supplier)session.load(Supplier.class, id);
+		contact.setSupplier(supplier);
+		supplier.getContacts().add(contact);
+		session.saveOrUpdate(contact);
+		tx.commit();
+		session.close();
 	}
 
 }

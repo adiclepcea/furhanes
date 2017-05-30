@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.clepcea.dao.SupplierDao;
+import org.clepcea.model.Contact;
 import org.clepcea.model.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,5 +74,14 @@ public class SupplierServiceImpl implements SupplierService{
 	public Supplier getSupplierById(long id) {
 		return supplierDao.getById(id);
 	}
+	@Override
+	public List<Contact> listContactsBySupplierId(long id) {
+		return supplierDao.contactListBySupplierId(id);
+	}
+	@Override
+	public void addContactBySupplierId(long id, Contact contact) {
+		supplierDao.addContactToSupplierId(id, contact);
+	}
 
+	
 }

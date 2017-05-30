@@ -1,11 +1,14 @@
 package org.clepcea.controllers;
 
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.clepcea.model.Contact;
 import org.clepcea.model.Supplier;
 import org.clepcea.services.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +88,21 @@ public class SupplierController {
 		logger.info("Modify supplier called");
 		supplierService.saveSupplier(supplier);
 		return supplier;
+	}
+	
+	@RequestMapping(value="/{id}/contacts",method=RequestMethod.GET)
+	public String getContacts(ModelMap model, @PathVariable long id){
+		 model.addAttribute("contacts",supplierService.listContactsBySupplierId(id));
+		 model.addAttribute("supplier_id",id);
+		 return "ContactList";
+	}
+	
+	@RequestMapping(value="/{id}/contacts",method=RequestMethod.POST)
+	public Object  addContact(@RequestBody Contact contact,  @PathVariable long id,HttpServletResponse response){
+		logger.info("Add contact to supplier called");
+		supplierService.addContactBySupplierId(id, contact);
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		return null;
 	}
 	
 }

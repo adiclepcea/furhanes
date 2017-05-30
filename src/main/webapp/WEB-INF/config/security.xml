@@ -71,6 +71,7 @@
     	<beans:property name="annotatedClasses">
     		<beans:list>
     			<beans:value>org.clepcea.model.Supplier</beans:value>
+    			<beans:value>org.clepcea.model.Contact</beans:value>
     		</beans:list>
     	</beans:property>
     	<beans:property name="hibernateProperties">
