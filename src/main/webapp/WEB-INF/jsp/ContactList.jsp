@@ -24,18 +24,20 @@
 		</thead>
 		<tbody>
 			<c:forEach var="contact" items="${contacts }">
-			<tr>
-				<td class="col-sm-2">${contact.name }</td>
-				<td class="col-sm-2">${contact.surname }</td>
-				<td class="col-sm-1">${contact.title }</td>
-				<td class="col-sm-1">${contact.contactFunction }</td>
-				<td class="col-sm-2">${contact.mail }</td>
-				<td class="col-sm-1">${contact.mobilePhone }</td>
-				<td class="col-sm-1">${contact.phone }</td>
-				<td class="col-sm-1">${contact.fax }</td>
+			<tr id="contact_${contact.id}">
+				<td class="col-sm-2"><span class="name">${contact.name }</span></td>
+				<td class="col-sm-2"><span class="surname">${contact.surname }</span></td>
+				<td class="col-sm-1"><span class="title">${contact.title }</span></td>
+				<td class="col-sm-1"><span class="function">${contact.contactFunction }</span></td>
+				<td class="col-sm-2"><span class="mail">${contact.mail }</span></td>
+				<td class="col-sm-1"><span class="mobilePhone">${contact.mobilePhone }</span></td>
+				<td class="col-sm-1"><span class="phone">${contact.phone }</span></td>
+				<td class="col-sm-1"><span class="fax">${contact.fax }</span></td>
 				<td class="col-sm-1">
-					<button class="btn btn-sm btn-danger" onclick="deleteContact(${contact.id},${supplier_id })">Del<span class="glyphicon glyphicon-trash"></span></button>
-					<button class="btn btn-sm btn-warning" onclick="editContact(${contact.id},${supplier_id})">Edit</button>
+					<button class="btn btn-sm btn-danger" onclick="deleteContact(${contact.id},${supplier_id })" id="del_contact_${contact.id}" >Del<span class="glyphicon glyphicon-trash"></span></button>
+					<button class="btn btn-sm btn-warning" onclick="editContact(${contact.id},${supplier_id})" id="edit_contact_${contact.id}">Edit</button>
+					<button class="btn btn-sm btn-info" onclick="showContact(${contact.id},${supplier_id })" id="cancel_edit_contact_${contact.id}" style="display:none">Cancel</button>
+					<button class="btn btn-sm btn-success" onclick="saveContact(${contact.id},${supplier_id})" id="save_contact_${contact.id}" style="display:none">Save</button>
 				</td>
 				<td>${contact.fax }</td>
 			</tr>

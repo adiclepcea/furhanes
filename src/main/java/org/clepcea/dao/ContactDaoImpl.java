@@ -3,6 +3,7 @@ package org.clepcea.dao;
 import java.util.List;
 
 import org.clepcea.model.Contact;
+import org.clepcea.model.Supplier;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -49,12 +50,11 @@ public class ContactDaoImpl implements ContactDao {
 	@Override
 	public void deleteById(long id) {
 		Session session = sessionFactory.openSession();
-		Contact contact = new Contact();
-		contact.setId(id);
-	
-		session.delete(contact);
-		session.flush();
-		
+		Contact contact = getById(id);
+		if(contact!=null){
+			session.delete(contact);
+			session.flush();
+		}
 		session.close();
 	}
 

@@ -319,7 +319,7 @@
 			}
 		}
 		
-		function showContactList(id){
+		function showContactList(id,fnc,args){
 			$.ajax({
 				url:"suppliers/"+id+"/contacts",
 				type:"GET",
@@ -340,6 +340,9 @@
 				success: function(data,textStatus,xhr){
 					$("#supplier_contacts_"+id).html(data);	
 					$("#supplier_no_of_contacts_"+id).text($("#supplier_contacts_"+id+" #no_of_contacts").val());
+					if(typeof(fnc)!='undefined'){//if we have a function to call...
+						fnc(args);
+					}
 				}
 			});
 		}
@@ -389,7 +392,7 @@
 			if(!confirm("Are you sure you want to delete the selected contact?")){
 				return;
 			}
-			ajax({
+			$.ajax({
 				url:"contacts/"+id,
 				type: "DELETE",
 				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
@@ -410,6 +413,36 @@
 					showContactList(supplier_id);
 				}
 			});
+		}
+		
+		function editContact(id,supplier_id){
+			showContactList(supplier_id,finishEditContact,[id, supplier_id]);
+		}
+		
+		function finishEditContact(arrIds){
+			var id=arrIds[0];
+			var supplier_id=arrIds[1];
+			$("#edit_contact_"+id).hide();
+			$("#del_contact_"+id).hide();
+			$("#save_contact_"+id).show();
+			$("#cancel_edit_contact_"+id).show();
+			//alert($("#contact_"+id+" .name").text());
+			$("#contact_"+id+" .name").html("<input type='text' value='"+$("#contact_"+id+" .name").text()+"' class='name_update col-sm-12'/>");
+			$("#contact_"+id+" .surname").html("<input type='text' value='"+$("#contact_"+id+" .surname").text()+"' class='surname_update col-sm-12'/>");
+			$("#contact_"+id+" .title").html("<input type='text' value='"+$("#contact_"+id+" .title").text()+"' class='title_update col-sm-12'/>");
+			$("#contact_"+id+" .function").html("<input type='text' value='"+$("#contact_"+id+" .function").text()+"' class='function_update col-sm-12'/>");
+			$("#contact_"+id+" .mail").html("<input type='text' value='"+$("#contact_"+id+" .mail").text()+"' class='mail_update col-sm-12'/>");
+			$("#contact_"+id+" .mobilePhone").html("<input type='text' value='"+$("#contact_"+id+" .mobilePhone").text()+"' class='mobilePhone_update col-sm-12'/>");
+			$("#contact_"+id+" .phone").html("<input type='text' value='"+$("#contact_"+id+" .phone").text()+"' class='phone_update col-sm-12'/>");
+			$("#contact_"+id+" .fax").html("<input type='text' value='"+$("#contact_"+id+" .fax").text()+"' class='fax_update col-sm-12'/>");
+		}
+		
+		function showContact(id,supplier_id){
+			$("#edit_contact_"+id).show();
+			$("#del_contact_"+id).show();
+			$("#save_contact_"+id).hide();
+			$("#cancel_edit_contact_"+id).hide();
+			showContactList(supplier_id);
 		}
 		
 	</script>
