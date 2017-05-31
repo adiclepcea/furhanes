@@ -37,9 +37,9 @@
 	      <ul class="nav navbar-nav">
 	      	<li class="active menu-item" id="mnuHome"><a href="#" onclick="goHome()">Home</a></li>
 	        <li class="menu-item" id="mnuSuppliers"><a href="#"onclick="showSuppliersList()">Suppliers</a></li>
-	        <li class="menu-item" id="mnuPOs"><a href="#">POs</a></li>
-	        <li class="menu-item" id="mnuReceptions"><a href="#">Receptions</a></li>
-	        <li class="menu-item" id="mnuStock"><a href="#">Stock</a></li>
+	        <li class="menu-item" id="mnuPOs"><a href="#" onclick="notYetImplemented('mnuPOs')">POs</a></li>
+	        <li class="menu-item" id="mnuReceptions" onclick="notYetImplemented('mnuReceptions')"><a href="#">Receptions</a></li>
+	        <li class="menu-item" id="mnuStock" onclick="notYetImplemented('mnuStock')"><a href="#">Stock</a></li>
 	      </ul>
 	      <ul class="nav navbar-nav navbar-right">
 	        <li><a href="#"><span class="glyphicon glyphicon-user"></span> Users </a></li>
@@ -54,8 +54,52 @@
 	</nav>
 	
 	<div id="container" class="container-fluid">
-	
+		<div  class="col-sm-6">
+		<div class="panel panel-default">
+		  <div class="panel-heading">Done</div>
+		  <div class="panel-body">
+		  	<ul>
+		  		<li>Background for security (database, and setup in config)</li>
+		  		<li>Database layout for:
+		  			<ul>
+		  				<li>Security (users, roles, rigts)</li>
+		  				<li>Suppliers</li>
+		  				<li>Contacts</li>
+		  				<li>Contracts</li>
+		  			</ul>
+		  		</li>
+		  		<li>Add, modify and delete suppliers</li>
+		  		<li>Add and modify contacts</li>
+		  	</ul>
+		  </div>
+		</div>
+		</div>
 		
+		<div class="col-sm-6">
+		<div class="panel panel-default">
+		  <div class="panel-heading">TO DO</div>
+		  <div class="panel-body">
+		  	<ul>
+		  		<li>Database layout for:
+		  			<ul>
+		  				<li>POs</li>
+		  				<li>Stock</li>
+		  				<li>Receptions</li>
+		  				<li>Locations</li>
+		  				<li>etc.</li>
+		  			</ul>
+		  		</li>
+		  		<li>Delete cotacts</li>
+		  		<li>Add, modify and delete contracts</li>
+		  		<li>Show notifications for expiring/expired contracts</li>
+		  		<li>Add, modify and delete POs</li>
+		  		<li>Add, modify and delete receptions</li>
+		  		<li>Reports</li>
+		  		<li>User rights interface</li> 
+		  	</ul>
+		  </div>
+		</div>
+		</div>				
 	</div>
 	
 	<form id="f-logout" action="${logoutUrl}" method="post">
@@ -66,7 +110,17 @@
 	
 	<script type="text/javascript">
 		var startPositionSupplier = 0;
-		var countPositionsSupplier = 3;
+		var countPositionsSupplier = 10;
+		
+		function goHome(){
+			window.location.replace(".");
+		}
+		
+		function notYetImplemented(mnu){
+			$("#container").html("<strong>Sorry, this feature is not yet implemented!</strong>");
+			$(".menu-item").removeClass("active");
+			$("#"+mnu).addClass("active");
+		}
 		
 		function logout(){
 			$("#f-logout").submit();
@@ -185,8 +239,14 @@
 					$("#supplier_msg_"+supplier.id).attr("class","alert alert-success");
 					$("#supplier_msg_data_"+supplier.id).html("Supplier <strong>"+supplier.name+"</strong> was saved!");
 					$("#supplier_msg_"+supplier.id).show();
+					setTimeout(closeAddSupplierAndRefreshList(),2000);
 				}
 			});
+		}
+		
+		function closeAddSupplierAndRefreshList(){
+			closeAddSupplier();
+			showSuppliersList();
 		}
 		
 		function redrawSupplier(supplier){
@@ -295,7 +355,6 @@
 			contact.observations=$("#supplier_contacts_"+id+" #contact_new_observations").val();
 			contact.contactFunction=$("#supplier_contacts_"+id+" #contact_new_function").val();
 			contact.mobilePhone=$("#supplier_contacts_"+id+" #contact_new_mobile").val();
-			alert(JSON.stringify(contact));
 			
 			$.ajax({
 				url:"suppliers/"+id+"/contacts",
@@ -319,8 +378,7 @@
 					}
 					alert("Error:\r\n"+err);
 				},
-				success: function(data,textStatus,xhr){
-					alert("data:"+xhr.status);			
+				success: function(data,textStatus,xhr){		
 					showContactList(id);
 				} 
 			});
