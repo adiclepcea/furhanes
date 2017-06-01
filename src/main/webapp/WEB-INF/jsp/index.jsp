@@ -359,11 +359,16 @@
 			contact.contactFunction=$("#supplier_contacts_"+id+" #contact_new_function").val();
 			contact.mobilePhone=$("#supplier_contacts_"+id+" #contact_new_mobile").val();
 			
+			if(contact.name=="" || contact.surname==""){
+				alert("Please input contact name and surname");
+				$("#supplier_contacts_"+id+" #contact_new_name").focus();
+				return;
+			}
+			
 			$.ajax({
 				url:"suppliers/"+id+"/contacts",
 				type: "POST",
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
-				type: "POST",
 				contentType: "application/json; charset=utf-8",
 				data:JSON.stringify(contact),
 				cache:false,
@@ -435,6 +440,45 @@
 			$("#contact_"+id+" .mobilePhone").html("<input type='text' value='"+$("#contact_"+id+" .mobilePhone").text()+"' class='mobilePhone_update col-sm-12'/>");
 			$("#contact_"+id+" .phone").html("<input type='text' value='"+$("#contact_"+id+" .phone").text()+"' class='phone_update col-sm-12'/>");
 			$("#contact_"+id+" .fax").html("<input type='text' value='"+$("#contact_"+id+" .fax").text()+"' class='fax_update col-sm-12'/>");
+		}
+		
+		function saveContact(id, supplier_id){
+			var contact = {};
+			contact.id = id;
+			contact.name = $("#contact_"+id+" .name_update").val();
+			contact.surname = $("#contact_"+id+" .surname_update").val();
+			contact.title = $("#contact_"+id+" .title_update").val();
+			contact.contactFunction = $("#contact_"+id+" .function_update").val();
+			contact.mail = $("#contact_"+id+" .mail_update").val();
+			contact.mobilePhone = $("#contact_"+id+" .mobilePhone_update").val();
+			contact.phone = $("#contact_"+id+" .phone_update").val();
+			contact.fax = $("#contact_"+id+" .fax_update").val();
+			
+			$.ajax({
+				url:"contacts/"+id,
+				type: "PUT",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				contentType: "application/json; charset=utf-8",
+				data:JSON.stringify(contact),
+				cache:false,
+				processData:false,
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to modify contacts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert("Error:\r\n"+err);
+				},
+				success: function(data){
+					showContactList(supplier_id);
+				}
+			});
 		}
 		
 		function showContact(id,supplier_id){

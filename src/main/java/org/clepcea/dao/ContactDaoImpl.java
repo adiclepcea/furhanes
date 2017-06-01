@@ -28,6 +28,8 @@ public class ContactDaoImpl implements ContactDao {
 		if(contact.getSurname().equals("")){
 			contact.setSurname(null);
 		}
+		Contact c=this.getById(contact.getId());
+		contact.setSupplier(c.getSupplier());
 		session.saveOrUpdate(contact);
 		tx.commit();
 		session.close();

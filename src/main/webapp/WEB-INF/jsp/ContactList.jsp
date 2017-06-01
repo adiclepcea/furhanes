@@ -16,7 +16,7 @@
 	<input type="text" id="contact_new_mobile" name="contact_new_mobile" class="col-sm-1" placeholder="Mobile"/>
 	<input type="text" id="contact_new_fax" name="contact_new_fax" class="col-sm-1" placeholder="Fax"/>
 	<input type="hidden" id="contact_new_obs" name="contact_new_obs"/>
-	<button class="btn btn-sm btn-success col-sm-1" onclick="addContactToSupplier(${supplier_id})">Add contact</button>
+	<button class="btn btn-sm btn-success col-sm-1" onclick="addContactToSupplier(${supplier_id})" style="margin:5px 0px 0px 5px">Add contact</button>
 	
 	<table class="table table-condensed table-hover">
 		<thead>
