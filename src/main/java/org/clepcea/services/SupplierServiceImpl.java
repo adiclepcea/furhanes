@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.clepcea.dao.SupplierDao;
 import org.clepcea.model.Contact;
+import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,13 @@ public class SupplierServiceImpl implements SupplierService{
 	public void addContactBySupplierId(long id, Contact contact) {
 		supplierDao.addContactToSupplierId(id, contact);
 	}
-
+	@Override
+	public List<Contract> listContractsBySupplierId(long id) {
+		return supplierDao.contractListBySupplierId(id);
+	}
+	@Override
+	public void addContractBySupplierId(long id, Contract contract) {
+		supplierDao.addContractToSupplierId(id, contract);
+	}
 	
 }

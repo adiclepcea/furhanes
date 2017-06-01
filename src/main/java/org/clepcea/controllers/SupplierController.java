@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.clepcea.model.Contact;
+import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
 import org.clepcea.services.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,6 +103,21 @@ public class SupplierController {
 	public Object  addContact(@RequestBody Contact contact,  @PathVariable long id,HttpServletResponse response){
 		logger.info("Add contact to supplier called");
 		supplierService.addContactBySupplierId(id, contact);
+		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		return null;
+	}
+	@RequestMapping(value="/{id}/contracts",method=RequestMethod.GET)
+	public String getContracts(ModelMap model, @PathVariable long id){
+		 model.addAttribute("contracts",supplierService.listContractsBySupplierId(id));
+		 model.addAttribute("supplier_id",id);
+		 return "ContractList";
+	}
+	
+	@RequestMapping(value="/{id}/contracts",method=RequestMethod.POST)
+	public Object  addContract(@ModelAttribute Contract contract,  @PathVariable long id,HttpServletResponse response){
+		logger.info("Add contract to supplier called");
+		logger.info(contract.getFile().getName());
+		supplierService.addContractBySupplierId(id, contract);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;
 	}

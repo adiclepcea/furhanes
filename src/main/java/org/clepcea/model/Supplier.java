@@ -1,8 +1,6 @@
 package org.clepcea.model;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +28,17 @@ public class Supplier implements java.io.Serializable{
 	
 	@OneToMany(fetch=FetchType.EAGER, mappedBy="supplier")
 	private List<Contact> contacts;
+	
+	@OneToMany(fetch=FetchType.EAGER, mappedBy="supplier")
+	private List<Contract> contracts;
+	
+	public List<Contract> getContracts() {
+		return contracts;
+	}
+	
+	public void setContracts(List<Contract> contracts) {
+		this.contracts = contracts;
+	}
 	
 	public List<Contact> getContacts() {
 		return contacts;

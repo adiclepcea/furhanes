@@ -38,7 +38,7 @@
 				</div>
 				<div class="col-md-4">
 					<button onclick="deleteSupplier(${supplier.id})" class="btn btn-sm btn-danger alignright">Del<span class="glyphicon glyphicon-trash"></span></button>
-					<button data-toggle="collapse" data-target="#suplier_contracts_${supplier.id}" class="btn btn-sm btn-info alignright"><span class="glyphicon glyphicon-briefcase"></span> <span id="supplier_no_of_contracts_${supplier.id }" class="badge">1</span></button>
+					<button data-toggle="collapse" data-target="#supplier_contracts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContractList(${supplier.id})"><span class="glyphicon glyphicon-briefcase"></span> <span id="supplier_no_of_contracts_${supplier.id }" class="badge">${supplier.contracts.size() }</span></button>
 					<button data-toggle="collapse" data-target="#supplier_contacts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContactList(${supplier.id})"><span class="glyphicon glyphicon-user"></span> <span id="supplier_no_of_contacts_${supplier.id }" class="badge">${supplier.contacts.size() }</span></button>								
 				</div>
 				<div id="supplier_edit_${supplier.id }" class="collapse col-md-12">

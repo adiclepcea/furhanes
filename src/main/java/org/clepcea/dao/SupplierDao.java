@@ -3,6 +3,7 @@ package org.clepcea.dao;
 import java.util.List;
 
 import org.clepcea.model.Contact;
+import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
 
 public interface SupplierDao {
@@ -12,4 +13,6 @@ public interface SupplierDao {
 	public Supplier getById(long id);
 	public List<Contact> contactListBySupplierId(long id);
 	public void addContactToSupplierId(long id, Contact contact);
+	public List<Contract> contractListBySupplierId(long id);
+	public void addContractToSupplierId(long id, Contract contract);
 }

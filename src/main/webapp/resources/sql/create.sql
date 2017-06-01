@@ -235,7 +235,7 @@ CREATE TABLE contracts
 (
     id integer not null,
     suppliers_id integer not null,
-    cotract_date date,
+    contract_date date,
     internal_number integer,
     expiration_date date,
     undefinite smallint default 0,
@@ -244,7 +244,9 @@ CREATE TABLE contracts
     filed varchar(50),
     payment_term integer,
     scan_file varchar(1000),
+    original_file_name varchar(1000),
     observations varchar(500),
+    do_not_renew smallint default 0,
     CONSTRAINT pk_contracts 
         PRIMARY KEY (id),
     constraint fk_suppliers_contracts

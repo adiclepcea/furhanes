@@ -10,9 +10,11 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link type="text/css" rel="stylesheet" href="<spring:url value='/resources/css/bootstrap.min.css'/>" />
+ 	<link type="text/css" rel="stylesheet" href="<spring:url value='/resources/css/jquery-ui.min.css'/>" />
     <link type="text/css" rel="stylesheet" href="<spring:url value='/resources/css/main.css'/>" />
     <script src="<spring:url value='/resources/js/jquery-3.2.1.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/bootstrap.min.js'/>" ></script>
+    <script src="<spring:url value='/resources/js/jquery-ui.min.js'/>" ></script>
     
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
@@ -487,6 +489,72 @@
 			$("#save_contact_"+id).hide();
 			$("#cancel_edit_contact_"+id).hide();
 			showContactList(supplier_id);
+		}
+		
+		function showContractList(id,fnc,args){
+			
+			$.ajax({
+				url:"suppliers/"+id+"/contracts",
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contracts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					$("#supplier_contracts_"+id).html(data);	
+					$("#supplier_no_of_contracts_"+id).text($("#supplier_contracts_"+id+" #no_of_contracts").val());
+					$("#supplier_contracts_"+id+" #contract_new_date").datepicker( { dateFormat: 'dd.mm.yy' } );
+					$("#supplier_contracts_"+id+" #contract_new_expiration_date").datepicker({ dateFormat: 'dd.mm.yy' });
+					
+					if(typeof(fnc)!='undefined'){//if we have a function to call...
+						fnc(args);
+					}
+				}
+			});
+		}
+		
+		function validateContract(contract_date, expiration_date,undefinite){
+			var strDate = contract_date.val();
+			if(!strDate){
+				alert("Please choose a date for the contract");
+				return false;
+			}
+			var date = $.datepicker.formatDate("yy-mm-dd",$.datepicker.parseDate("dd.mm.yy",strDate));
+			
+			var strExpDate = expiration_date.val();
+			if(!strExpDate && !undefinite.is(':checked')){
+				alert("Please choose either a expiration date for the contract or Undefinite!");				
+				return false;
+			}
+			var expDate = $.datepicker.formatDate("yy-mm-dd",$.datepicker.parseDate("dd.mm.yy",strExpDate));
+			
+			var rez={}
+			rez.date=date;
+			rez.expDate=expDate;
+			rez.undefinite = undefinite.is(':checked');
+			
+			return rez;
+		}
+		
+		function addContractToSupplier(supplier_id){
+			var rez=validateContract($("#supplier_contracts_"+supplier_id+" #contract_new_date"), 
+					$("#supplier_contracts_"+supplier_id+" #contract_new_expiration_date"),
+					$("#supplier_contracts_"+supplier_id+" #contract_new_undefinite"));
+			if(!rez){
+				return false;
+			}
+			alert(rez.date);
+			$("#frm_supplier_contracts_"+supplier_id).submit();
 		}
 		
 	</script>

@@ -31,42 +31,12 @@
 		<property name="suffix" value=".jsp"></property>
 	</bean> 
 	<bean id="springSecurityFilterChain" class="org.springframework.web.filter.DelegatingFilterProxy"/>
-	<!-- <bean id="supplierService" class="org.clepcea.services.SupplierServiceImpl"/> -->
-	
-<!--<security:authentication-manager>
- <security:authentication-provider user-service-ref="jdbcUserService">
- </security:authentication-provider>
-</security:authentication-manager> 
-<bean id="jdbcUserService" class="org.clepcea.authentication.FurhanesAuthenticationProvider">
-    	<property name="dataSource" ref="dataSource"/>
-    	<property name="enableGroups" value="true"/>
-    	<property name="enableAuthorities" value="false"/>
-    	<property name="groupAuthoritiesByUsernameQuery">
-    		<value>
-				SELECT r.ID, r.NAME, rights.NAME
-				FROM ROLES r 
-				inner join USERS2ROLES u2r on u2r.ROLES_ID=r.ID
-				inner join ROLES2RIGHTS r2r on r2r.ROLES_ID=r.ID 
-				inner join RIGHTS rights on rights.ID=r2r.RIGHTS_ID
-				inner join users u on u.ID=u2r.USERS_ID
-				where u.USERNAME=?    			
-    		</value>
-    	</property>
-    </bean>
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-    	<property name="driverClassName" value="${db.driver}"/>
-    	<property name="url" value="${db.url}"/>
-    	<property name="username" value="${db.username}"/>
-    	<property name="password" value="${db.password}"/>
-    </bean>
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 
+		 <!-- setting maximum upload size -->
+		<property name="maxUploadSize" value="100000" />
 
- <security:authentication-manager> <security:authentication-provider> 
- 	<security:user-service> 
- 		<security:user name="user" password="user@123" authorities="ROLE_ADMIN" /> 
- 	</security:user-service>   
-  </security:authentication-provider> 
- </security:authentication-manager>
--->
+	</bean>
 								
 </beans>
