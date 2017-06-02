@@ -1,13 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <div>
-	<form method="POST" 
-		id="frm_supplier_contracts_${supplier_id }" 
-		enctype="multipart/form-data" 
-		action="<spring:url value='/suppliers/${supplier_id }/contracts'/>">
+	
+		
 		<input type="hidden" id="supplier_id" value="${supplier_id}">
 		<input type="hidden" id="no_of_contracts" value="${contracts.size()}">
 		
@@ -22,37 +21,53 @@
 		<div class="checkbox-inline"><label><input type="checkbox" id="contract_new_do_not_renew" name="contract_new_do_not_renew" value=""/>Do not renew</label></div>
 		</div>
 		<input type="hidden" id="contract_new_observations" name="contract_new_observations"/>
-		<input id="contract_upload_${supplier_id }" type="file" name="file"  />
-		<button class="btn btn-sm btn-info col-sm-1" onclick="document.getElementById('contract_upload_${supplier_id}').click();return false;">Choose file</button>
+		
 		<button type="submit" class="btn btn-sm btn-success col-sm-1" onclick="addContractToSupplier(${supplier_id});return false;" style="margin:0px 0px 0px 5px">Add contract</button>
 		<input type="hidden" id="csrf"
 		name="${_csrf.parameterName}"
 		value="${_csrf.token}" />
-	</form>
+	
+	<div id="messageDiv" style="display:none">Please wait while uploading the file</div>
 	<table class="table table-condensed table-hover">
 		<thead>
-			<tr><td>Date</td><td>Internal no</td><td>Expires on</td><td>Contract object</td><td>Payment term  (days)</td><td>Undefinite</td><td>Filed</td><td>Do not renew</td></tr>
+			<tr><td>Date</td><td>Internal no</td><td>Expires on</td><td>Contract object</td><td>Payment term  (days)</td><td>Undefinite</td><td>Filed</td><td>Do not renew</td><td>Scanned file</td></tr>
 		</thead>
 		<tbody>
 			<c:forEach var="contract" items="${contracts }">
 			<tr id="contract_${contract.id}">
-				<td class="col-sm-1"><span class="date">${contract.date }</span></td>
+				<td class="col-sm-1"><span class="date"><fmt:formatDate pattern = "dd.MM.yyyy" value = "${contract.contractDate }" /></span></td>
 				<td class="col-sm-1"><span class="internal_number">${contract.internalNumber }</span></td>
-				<td class="col-sm-1"><span class="expiration_date">${contract.expirationDate }</span></td>
-				<td class="col-sm-2"><span class="object">${contract.object }</span></td>
+				<td class="col-sm-1"><span class="expiration_date"><fmt:formatDate pattern = "dd.MM.yyyy" value = "${contract.expirationDate }" /></span></td>
+				<td class="col-sm-2"><span class="object">${contract.contractObject }</span></td>
 				<td class="col-sm-1"><span class="payment_term">${contract.paymentTerm }</span></td>
 				<td class="col-sm-1"><span class="undefinite">${contract.undefinite }</span></td>
 				<td class="col-sm-1"><span class="filed">${contract.filed }</span></td>
 				<td class="col-sm-1"><span class="do_not_renew">${contract.doNotRenew }</span></td>
-				<td class="col-sm-1">
-					<button class="btn btn-sm btn-danger" onclick="deleteContract(${contract.id},${supplier_id })" id="del_contract_${contract.id}" >Del<span class="glyphicon glyphicon-trash"></span></button>
-					<button class="btn btn-sm btn-warning" onclick="editContract(${contract.id},${supplier_id})" id="edit_contract_${contract.id}">Edit</button>
-					<button class="btn btn-sm btn-info" onclick="showContract(${contract.id},${supplier_id })" id="cancel_edit_contract_${contract.id}" style="display:none">Cancel</button>
-					<button class="btn btn-sm btn-success" onclick="saveContract(${contract.id},${supplier_id})" id="save_contract_${contract.id}" style="display:none">Save</button>
+				<td class="col-sm-1"><span class="scan">
+					<c:if test="${contract.originalFileName!=null }">
+					<button class="btn btn-sm btn-danger" onclick="deleteContractFile(${contract.id},${supplier_id})"><span class="glyphicon glyphicon-trash"></span></button>					
+					<a download="${contract.originalFileName }" href="<spring:url value='/contracts/${contract.id }/download'/>" title="${contract.originalFileName }">Download</a>				
+					</c:if>	
+				</span></td>
+				
+				<td class="col-sm-2">
+					
+					<button class="btn btn-sm btn-danger" onclick="deleteContract(${contract.id},${supplier_id });return false;" id="del_contract_${contract.id}" >Del<span class="glyphicon glyphicon-trash"></span></button>
+					<button class="btn btn-sm btn-warning" onclick="editContract(${contract.id},${supplier_id});return false;" id="edit_contract_${contract.id}">Edit</button>
+					<button class="btn btn-sm btn-info" onclick="showContract(${contract.id},${supplier_id });return false;" id="cancel_edit_contract_${contract.id}" style="display:none">Cancel</button>
+					<button class="btn btn-sm btn-success" onclick="saveContract(${contract.id},${supplier_id});return false;" id="save_contract_${contract.id}" style="display:none">Save</button>
+					<button class="btn btn-sm btn-info" onclick="document.getElementById('contract_upload_${contract.id}').click();">File<span class="glyphicon glyphicon-upload"></span></button>
+					<form method="POST" 
+						id="frm_supplier_contracts_${contract.id }"
+						enctype="multipart/form-data" 
+						action="<spring:url value='/suppliers/${supplier_id }/contracts'/>">
+						<input id="contract_upload_${contract.id }" type="file" name="file" style="display:none" onchange="uploadContractFile(${contract.id },${supplier_id },this.files)"/>
+					</form>
 				</td>
-				<td>${contact.fax }</td>
+				<td>${contact.fax }</td>				
 			</tr>
 			</c:forEach>
 		</tbody>
 	</table>
+	
 </div>

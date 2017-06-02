@@ -16,6 +16,7 @@ public class ContractServiceImpl implements ContractService {
 	private ContractDao contractDao;
 	@Override
 	public void saveContract(Contract contract) {
+		
 		contractDao.save(contract);
 	}
 
@@ -32,7 +33,6 @@ public class ContractServiceImpl implements ContractService {
 	@Override
 	public void deleteContractById(long id) {
 		contractDao.deleteById(id);
-
 	}
 
 }

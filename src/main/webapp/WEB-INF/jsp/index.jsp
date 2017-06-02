@@ -114,6 +114,12 @@
 		var startPositionSupplier = 0;
 		var countPositionsSupplier = 10;
 		
+		function isInt(value) {
+			  return !isNaN(value) && 
+			         parseInt(Number(value)) == value && 
+			         !isNaN(parseInt(value, 10));
+			}
+		
 		function goHome(){
 			window.location.replace(".");
 		}
@@ -511,7 +517,7 @@
 					alert(err);
 				},
 				success: function(data,textStatus,xhr){
-					$("#supplier_contracts_"+id).html(data);	
+					$("#supplier_contracts_"+id).html(data);						
 					$("#supplier_no_of_contracts_"+id).text($("#supplier_contracts_"+id+" #no_of_contracts").val());
 					$("#supplier_contracts_"+id+" #contract_new_date").datepicker( { dateFormat: 'dd.mm.yy' } );
 					$("#supplier_contracts_"+id+" #contract_new_expiration_date").datepicker({ dateFormat: 'dd.mm.yy' });
@@ -523,24 +529,38 @@
 			});
 		}
 		
-		function validateContract(contract_date, expiration_date,undefinite){
-			var strDate = contract_date.val();
+		function validateContract(contractDate, expirationDate,undefinite,internalNumber,paymentTerm){
+			var strDate = contractDate.val();
 			if(!strDate){
 				alert("Please choose a date for the contract");
+				contractDate.focus();
 				return false;
 			}
 			var date = $.datepicker.formatDate("yy-mm-dd",$.datepicker.parseDate("dd.mm.yy",strDate));
 			
-			var strExpDate = expiration_date.val();
+			var strExpDate = expirationDate.val();
 			if(!strExpDate && !undefinite.is(':checked')){
 				alert("Please choose either a expiration date for the contract or Undefinite!");				
 				return false;
 			}
 			var expDate = $.datepicker.formatDate("yy-mm-dd",$.datepicker.parseDate("dd.mm.yy",strExpDate));
 			
+			if(!isInt(internalNumber.val())){
+				alert("Please choose a correct internal number. Hint: it should be an integer. "+internalNumber.val()+" is not."+parseInt(internalNumber.val()));
+				internalNumber.focus();
+				return false;
+			}
+			
+			var pt = 0;
+			if(paymentTerm.val() === parseInt(paymentTerm.val())){
+				pt = paymentTerm.val();
+			}
+			
 			var rez={}
 			rez.date=date;
 			rez.expDate=expDate;
+			rez.internalNumber = internalNumber.val();
+			rez.paymentTerm = paymentTerm.val();
 			rez.undefinite = undefinite.is(':checked');
 			
 			return rez;
@@ -549,13 +569,139 @@
 		function addContractToSupplier(supplier_id){
 			var rez=validateContract($("#supplier_contracts_"+supplier_id+" #contract_new_date"), 
 					$("#supplier_contracts_"+supplier_id+" #contract_new_expiration_date"),
-					$("#supplier_contracts_"+supplier_id+" #contract_new_undefinite"));
+					$("#supplier_contracts_"+supplier_id+" #contract_new_undefinite"),
+					$("#supplier_contracts_"+supplier_id+" #contract_new_internal_number"),
+					$("#supplier_contracts_"+supplier_id+" #contract_new_payment_term"));
 			if(!rez){
 				return false;
 			}
-			alert(rez.date);
-			$("#frm_supplier_contracts_"+supplier_id).submit();
+			
+			contract={};
+			contract.supplierId = supplier_id;
+			contract.expirationDate = rez.expDate;
+			contract.contractDate = rez.date;
+			contract.undefinite = rez.undefinite;
+			contract.internalNumber = rez.internalNumber;
+			contract.contractObject = $("#supplier_contracts_"+supplier_id+"contract_new_object").val();
+			contract.paymentTerm = rez.paymentTerm;
+			contract.undefinite = rez.undefinite;
+			contract.filed = $("#supplier_contracts_"+supplier_id+" #contract_new_filed").is(':checked');
+			contract.doNotRenew = $("#supplier_contracts_"+supplier_id+" #contract_new_do_not_renew").is(':checked');
+			contract.observations = $("#supplier_contracts_"+supplier_id+"contract_new_observations").val();
+			
+			alert(JSON.stringify(contract));
+			
+			$.ajax({
+				url: "suppliers/"+supplier_id+"/contracts",
+				type:"POST",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				cache:false,
+				data:JSON.stringify(contract),
+				processData:false,
+				success:function(data){
+					showContractList(supplier_id);
+				},
+				error: function(data){
+					alert(data.responseText);
+					console.log(data);
+				}
+			});
+			
 		}
+		
+		function deleteContractFile(id,supplier_id ){
+			if(confirm("Are you sure you want to delete the selected contract file?")){
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").show();
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-info");
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").html("Please wait while the file is being deleted");
+				$.ajax({
+					url:"contracts/"+id+"/file",
+					type:"DELETE",
+					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+					success: function(data){
+						showContractList(supplier_id);
+					},
+					error: function(err){
+						if(err.hasOwnProperty("responseText")){
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").html(err.responseText);
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-danger");
+							console.log(err);	
+						}else{
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").html("An unknown error occured!");
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-danger");
+							console.log(err);								
+						}		
+					}
+				});
+			}
+		}
+		
+		function uploadContractFile( id,supplier_id,list){
+			console.log(list);
+			if(list.length==0){
+				return;
+			}
+			try{				
+				
+				
+				var frmData = new FormData(document.getElementById("frm_supplier_contracts_"+id));
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").show();
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").html("Please wait while uploading the file");
+				$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-info");
+				console.log(frmData);
+				
+				$.ajax({
+					url: "contracts/"+id+"/file",
+					type:"POST",
+					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+					data: frmData,
+					cache:false,				
+					processData:false,
+					contentType:false,
+					success: function(data){						
+						$("#supplier_contracts_"+supplier_id+" #messageDiv").hide();
+						showContractList(supplier_id);
+					},
+					error:function(err){
+						if(err.hasOwnProperty("responseText")){
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").html(err.responseText);
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-danger");
+							console.log(err);	
+						}else{
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").html("An unknown error occured!");
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-danger");
+							console.log(err);								
+						}		
+					}
+				});
+			}catch(err){
+				alert(err);
+				console.log(err);
+			}
+			return false;
+		}
+		
+		function deleteContract(id, supplier_id){
+			if(confirm("Are you sure you want to delete the selected contract?")){
+				$.ajax({
+					url:"contracts/"+id,
+					type:"DELETE",
+					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+					success: function(data){
+						showContractList(supplier_id);
+					},
+					error:function(err){
+						if(err.hasOwnProperty("responseText")){
+							console.log(err);	
+						}else{
+							console.log(err);								
+						}		
+					}
+				});
+			}
+		}
+		
+		
 		
 	</script>
 </body>

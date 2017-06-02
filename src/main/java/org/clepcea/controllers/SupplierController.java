@@ -114,9 +114,8 @@ public class SupplierController {
 	}
 	
 	@RequestMapping(value="/{id}/contracts",method=RequestMethod.POST)
-	public Object  addContract(@ModelAttribute Contract contract,  @PathVariable long id,HttpServletResponse response){
+	public Object  addContract(@RequestBody Contract contract,  @PathVariable long id,HttpServletResponse response){
 		logger.info("Add contract to supplier called");
-		logger.info(contract.getFile().getName());
 		supplierService.addContractBySupplierId(id, contract);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;

@@ -34,12 +34,12 @@ public class Contract implements Serializable{
 	@Id
 	@Column(name="ID")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
+	private long id;
 	@ManyToOne
 	@JoinColumn(name="SUPPLIERS_ID",nullable=false)
 	private Supplier supplier;
 	@Column(name="CONTRACT_DATE")
-	private Date cotractDate;
+	private Date contractDate;
     @Column(name="INTERNAL_NUMBER")
 	private int internalNumber;
     @Column(name="EXPIRATION_DATE")
@@ -63,10 +63,10 @@ public class Contract implements Serializable{
     @Column(name="DO_NOT_RENEW")
     private boolean doNotRenew;
     
-	public int getId() {
+	public long getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	public Supplier getSupplier() {
@@ -75,11 +75,11 @@ public class Contract implements Serializable{
 	public void setSupplier(Supplier supplier) {
 		this.supplier = supplier;
 	}
-	public Date getCotractDate() {
-		return cotractDate;
+	public Date getContractDate() {
+		return contractDate;
 	}
-	public void setCotractDate(Date cotractDate) {
-		this.cotractDate = cotractDate;
+	public void setContractDate(Date cotractDate) {
+		this.contractDate = cotractDate;
 	}
 	public int getInternalNumber() {
 		return internalNumber;
