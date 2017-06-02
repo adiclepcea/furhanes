@@ -3,9 +3,10 @@ CREATE TABLE users
 (
     id integer not null,
     username varchar(20),
-    password varchar(256),
+    pass varchar(256),
     name varchar(250),
     mail varchar(100),
+    enables smallint,
     CONSTRAINT PK_USERS
         PRIMARY KEY (id)
 );
@@ -31,6 +32,8 @@ SET TERM ; !!
 
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON USERS TO roskofur;
+
+insert into users (username, pass, enabled) values('administrator','2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b',1);
 
 --roles
 CREATE TABLE roles
@@ -66,6 +69,7 @@ SET TERM ; !!
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON ROLES TO roskofur;
 
+
 --rights
 
 CREATE TABLE rights
@@ -97,6 +101,13 @@ END!!
 SET TERM ; !!
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON RIGHTS TO roskofur;
+
+insert into RIGHTS(NAME) values('ROLE_RIGHT_HOME');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_PO');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_SUPPLIERS');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_RECEPTIONS');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_STOCK');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_USERS');
 
 --users2roles
 CREATE TABLE users2roles
@@ -130,6 +141,7 @@ END!!
 SET TERM ; !!
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON USERS2ROLES TO roskofur;
+insert into users2roles(users_id, roles_id) values(1,1);
 
 --roles2rights
 CREATE TABLE roles2rights
@@ -163,6 +175,13 @@ END!!
 SET TERM ; !!
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON ROLES2RIGHTS TO roskofur;
+
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,1);
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,2);
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,3);
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,4);
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,5);
+insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,6);
 
 --suppliers
 
@@ -210,3 +229,93 @@ SET TERM ; !!
 
 
 GRANT SELECT,INSERT,UPDATE,DELETE,REFERENCES ON SUPPLIERS TO roskofur;
+
+--contracts
+CREATE TABLE contracts
+(
+    id integer not null,
+    suppliers_id integer not null,
+    contract_date date,
+    internal_number integer,
+    expiration_date date,
+    undefinite smallint default 0,
+    contract_object varchar(300),
+    contact_person integer,
+    filed varchar(50),
+    payment_term integer,
+    scan_file varchar(1000),
+    original_file_name varchar(1000),
+    observations varchar(500),
+    do_not_renew smallint default 0,
+    CONSTRAINT pk_contracts 
+        PRIMARY KEY (id),
+    constraint fk_suppliers_contracts
+        FOREIGN KEY (SUPPLIERS_ID) REFERENCES SUPPLIERS (ID)
+
+);
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON CONTRACTS TO roskofur;
+
+CREATE GENERATOR GEN_CONTRACTS_ID;
+
+SET TERM !! ;
+CREATE TRIGGER CONTRACTS_BI FOR CONTRACTS
+ACTIVE BEFORE INSERT POSITION 0
+AS
+DECLARE VARIABLE tmp DECIMAL(18,0);
+BEGIN
+  IF (NEW.ID IS NULL) THEN
+    NEW.ID = GEN_ID(GEN_CONTRACTS_ID, 1);
+  ELSE
+  BEGIN
+    tmp = GEN_ID(GEN_CONTRACTS_ID, 0);
+    if (tmp < new.ID) then
+      tmp = GEN_ID(GEN_CONTRACTS_ID, new.ID-tmp);
+  END
+END!!
+SET TERM ; !!
+
+--contacts
+CREATE TABLE contacts
+(
+    ID integer not null,
+    NAME varchar(200),
+    SURNAME varchar(250),
+    TITLE varchar(20),
+    CONTACT_FUNCTION varchar(200),
+    MAIL varchar(400),
+    FAX varchar(200),
+    PHONE varchar(200),
+    MOBILE_PHONE varchar(200),
+    OBSERVATIONS varchar(500),
+    SUPPLIERS_ID integer not null,
+    
+    CONSTRAINT PK_CONTACTS
+        PRIMARY KEY (ID),
+    constraint FK_SUPPLIERS_CONTACTS
+        FOREIGN KEY (SUPPLIERS_ID) REFERENCES SUPPLIERS (ID)
+        
+);
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON CONTACTS TO roskofur;
+
+CREATE GENERATOR GEN_CONTACTS_ID;
+
+SET TERM !! ;
+CREATE TRIGGER CONTACTS_BI FOR CONTACTS
+ACTIVE BEFORE INSERT POSITION 0
+AS
+DECLARE VARIABLE tmp DECIMAL(18,0);
+BEGIN
+  IF (NEW.ID IS NULL) THEN
+    NEW.ID = GEN_ID(GEN_CONTACTS_ID, 1);
+  ELSE
+  BEGIN
+    tmp = GEN_ID(GEN_CONTACTS_ID, 0);
+    if (tmp < new.ID) then
+      tmp = GEN_ID(GEN_CONTACTS_ID, new.ID-tmp);
+  END
+END!!
+SET TERM ; !!
+
+

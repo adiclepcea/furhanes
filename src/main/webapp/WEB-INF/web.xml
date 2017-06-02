@@ -21,12 +21,16 @@
   <welcome-file-list>
     <welcome-file>/</welcome-file>
   </welcome-file-list>
+  <error-page>
+  	<error-code>404</error-code>
+  	<location>/missing.html</location>
+  </error-page>
   <!-- Spring Security -->
     
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		<param-name>contextConfigLocation</param-name>		
+		<!-- <param-name>contextConfigLocation</param-name> -->		
 	</filter>
 	<filter-mapping>
 		<filter-name>springSecurityFilterChain</filter-name>

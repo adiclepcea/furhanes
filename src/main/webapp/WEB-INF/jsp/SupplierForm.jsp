@@ -15,72 +15,76 @@
 
 </head>
 <body>
-	<div id="global" class="container">
-		<form action=${supplier.id==0?"\".\"":"\"${supplier.id}\""} method=${supplier.id==0?"\"POST\"":"\"PUT\""} class="form-horizontal form">			
+	<div id="supplier_form_${supplier.id }" class="container-fluid form-signin">
+		<!-- <form action=${supplier.id==0?"\"/furhanes/suppliers/\"":"\"/furhanes/suppliers/\"${supplier.id}"} method=${supplier.id==0?"\"POST\"":"\"PUT\""}>  -->			
 			<fieldset>				
-				<legend>${supplier.id==0?"Add a supplier":"Edit the supplier"}</legend>				
-				<input type="hidden" id="id" name="id" value="${supplier.id }"/>				
-				<div class="form-group">
-					<label class="control-label col-xs-2" for="name">Name:</label>
-					<div class="col-xs-10">
-						<input type="TEXT" id="name" name="name" value="${supplier.name}" class="form-control col-sm-10" placeholder="Name of the supplier"/>
+				<legend>${supplier.id==0?"Add a supplier":""}</legend>				
+				<input type="hidden" id="supplier_id" name="id" value="${supplier.id }"/>
+				<div class="row">	
+					<div class="form-group" id="supplier_name_group">			
+					<label class="control-label col-sm-1" for="name">Name:</label>
+					<div class="col-sm-5">
+						<input type="TEXT" id="supplier_name" name="name" value="${supplier.name}" class="form-control col-sm-12" placeholder="Name of the supplier"/>
+					</div>				
 					</div>
-				</div>
-				<div class="form-group">				
-						<label class="control-label col-xs-2" for="cui">CUI:</label>
-						<div class=col-xs-4>
-							<input type="TEXT" id="cui" name="cui" value="${supplier.cui}" class="form-control" placeholder="CUI"/>
-						</div>
-						<label class="control-label col-xs-2" for="j">J:</label>
-						<div class="col-xs-4">
-							<input type="TEXT" id="j" name="j" value="${supplier.j}" class="form-control" placeholder="Nr. Reg. Com."/>
-						</div>
-				</div>
-				
-				<div class="form-group">					
-					<label class="control-label col-xs-2" for="address">Address:</label>
-					<div class="col-xs-10">
-						<textarea cols="20"rows="5" id="address" name="address" class="form-control coll-sm-10" placeholder="Address">${supplier.address}</textarea>
+					<label class="control-label col-sm-1" for="cui">CUI:</label>
+					<div class=col-sm-2>
+						<input type="TEXT" id="supplier_cui" name="cui" value="${supplier.cui}" class="form-control col-sm-12" placeholder="CUI"/>
 					</div>
-				</div>
-				<div class="form-group">
-					<label class="control-label col-xs-2" for="bank">Bank:</label>
-					<div class="col-xs-10">
-						<input type="TEXT" id="bank" name="bank" value="${supplier.bank}" class="form-control col-sm-10" placeholder="Suppliers bank"/>
+					
+					<label class="control-label col-sm-1" for="j">J:</label>
+					<div class="col-sm-2">
+						<input type="TEXT" id="supplier_j" name="j" value="${supplier.j}" class="form-control col-sm-12" placeholder="Nr. Reg. Com."/>
 					</div>
 				</div>
 				
-				<div class="form-group">				
-						<label class="control-label col-xs-2" for="phone">Phone:</label>
-						<div class=col-xs-4>
-							<input type="TEXT" id="phone" name="phone" value="${supplier.phone}" class="form-control" placeholder="Phone"/>
+				<div class="row">					
+					<label class="control-label col-sm-1" for="address">Address:</label>
+					<div class="col-sm-7">
+						<textarea cols="20" rows="3" id="supplier_address" name="address" class="form-control coll-sm-12" placeholder="Address">${supplier.address}</textarea>
+					</div>
+					<div class="col-sm-4">
+						<label class="control-label col-sm-3" for="mail">E-mail:</label>
+						<div class="col-sm-9">
+							<input type="TEXT" id="supplier_mail" name="mail" value="${supplier.mail}" class="form-control col-sm-12" placeholder="Suppliers e-mail"/>
 						</div>
-						<label class="control-label col-xs-2" for="fax">Fax:</label>
-						<div class="col-xs-4">
-							<input type="TEXT" id="fax" name="fax" value="${supplier.fax}" class="form-control" placeholder="Fax"/>
+						
+						<label class="control-label col-sm-3" for="phone">Phone:</label>
+						<div class=col-sm-9>
+							<input type="TEXT" id="supplier_phone" name="phone" value="${supplier.phone}" class="form-control col-sm-12" placeholder="Phone"/>
 						</div>
-				</div>
-				<div class="form-group">
-					<label class="control-label col-xs-2" for="mail">E-mail:</label>
-					<div class="col-xs-10">
-						<input type="TEXT" id="mail" name="mail" value="${supplier.mail}" class="form-control col-sm-10" placeholder="Suppliers e-mail"/>
+						
+						<label class="control-label col-sm-3" for="fax">Fax:</label>
+						<div class="col-sm-9">
+							<input type="TEXT" id="supplier_fax" name="fax" value="${supplier.fax}" class="form-control col-sm-12" placeholder="Fax"/>
+						</div>
 					</div>
 				</div>
 				
-				<div class="form-group">				
-						<label class="control-label col-xs-2" for="swift">Swift:</label>
-						<div class=col-xs-4>
-							<input type="TEXT" id="swift" name="swift" value="${supplier.swift}" class="form-control" placeholder="SWIFT Code"/>
-						</div>
-						<label class="control-label col-xs-2" for="bic">BIC:</label>
-						<div class="col-xs-4">
-							<input type="TEXT" id="bic" name="bic" value="${supplier.bic}" class="form-control" placeholder="BIC code"/>
-						</div>
+				<div class="row">
+					<label class="control-label col-sm-1" for="bank">Bank:</label>
+					<div class="col-sm-5">
+						<input type="TEXT" id="supplier_bank" name="bank" value="${supplier.bank}" class="form-control col-sm-12" placeholder="Suppliers bank"/>
+					</div>
+					<label class="control-label col-sm-1" for="swift">Swift:</label>
+					<div class=col-sm-2>
+						<input type="TEXT" id="supplier_swift" name="swift" value="${supplier.swift}" class="form-control col-sm-12" placeholder="SWIFT Code"/>
+					</div>
+					<label class="control-label col-sm-1" for="swift">IBAN:</label>
+					<div class=col-sm-2>
+						<input type="TEXT" id="supplier_iban" name="iban" value="${supplier.iban}" class="form-control col-sm-12" placeholder="IBAN code"/>
+					</div>	
 				</div>
-				<div><button class="btn btn-lg btn-primary btn-block" type="submit">Save</button></div>
+				<div>
+				<div class="alert alert-info" id="supplier_msg_${supplier.id}">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<span id="supplier_msg_data_${supplier.id }">You are editing a supplier</span> 
+				</div>
+				<button class="btn btn-md btn-success alignright" onclick="saveSupplier(${supplier.id })">Save</button></div>
 				
 			</fieldset>
-		</form>
+			
+		<!-- </form>  -->
 	</div>
 
 </body>
