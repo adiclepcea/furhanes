@@ -71,7 +71,8 @@
 		  			</ul>
 		  		</li>
 		  		<li>Add, modify and delete suppliers</li>
-		  		<li>Add and modify contacts</li>
+		  		<li>Add, modify and delete contacts</li>
+		  		<li>Add, modify and delete contracts</li>
 		  	</ul>
 		  </div>
 		</div>
@@ -90,9 +91,7 @@
 		  				<li>Locations</li>
 		  				<li>etc.</li>
 		  			</ul>
-		  		</li>
-		  		<li>Delete cotacts</li>
-		  		<li>Add, modify and delete contracts</li>
+		  		</li>		  		
 		  		<li>Show notifications for expiring/expired contracts</li>
 		  		<li>Add, modify and delete POs</li>
 		  		<li>Add, modify and delete receptions</li>
@@ -519,8 +518,8 @@
 				success: function(data,textStatus,xhr){
 					$("#supplier_contracts_"+id).html(data);						
 					$("#supplier_no_of_contracts_"+id).text($("#supplier_contracts_"+id+" #no_of_contracts").val());
-					$("#supplier_contracts_"+id+" #contract_new_date").datepicker( { dateFormat: 'dd.mm.yy' } );
-					$("#supplier_contracts_"+id+" #contract_new_expiration_date").datepicker({ dateFormat: 'dd.mm.yy' });
+					$("#contract_new_date_"+id).datepicker( { dateFormat: 'dd.mm.yy' } );
+					$("#contract_new_expiration_date_"+id).datepicker({ dateFormat: 'dd.mm.yy' });
 					
 					if(typeof(fnc)!='undefined'){//if we have a function to call...
 						fnc(args);
@@ -567,8 +566,8 @@
 		}
 		
 		function addContractToSupplier(supplier_id){
-			var rez=validateContract($("#supplier_contracts_"+supplier_id+" #contract_new_date"), 
-					$("#supplier_contracts_"+supplier_id+" #contract_new_expiration_date"),
+			var rez=validateContract($("#contract_new_date_"+supplier_id), 
+					$("#contract_new_expiration_date_"+supplier_id),
 					$("#supplier_contracts_"+supplier_id+" #contract_new_undefinite"),
 					$("#supplier_contracts_"+supplier_id+" #contract_new_internal_number"),
 					$("#supplier_contracts_"+supplier_id+" #contract_new_payment_term"));
@@ -582,14 +581,12 @@
 			contract.contractDate = rez.date;
 			contract.undefinite = rez.undefinite;
 			contract.internalNumber = rez.internalNumber;
-			contract.contractObject = $("#supplier_contracts_"+supplier_id+"contract_new_object").val();
+			contract.contractObject = $("#supplier_contracts_"+supplier_id+" #contract_new_object").val();
 			contract.paymentTerm = rez.paymentTerm;
 			contract.undefinite = rez.undefinite;
-			contract.filed = $("#supplier_contracts_"+supplier_id+" #contract_new_filed").is(':checked');
+			contract.filed = $("#supplier_contracts_"+supplier_id+" #contract_new_filed").val();
 			contract.doNotRenew = $("#supplier_contracts_"+supplier_id+" #contract_new_do_not_renew").is(':checked');
 			contract.observations = $("#supplier_contracts_"+supplier_id+"contract_new_observations").val();
-			
-			alert(JSON.stringify(contract));
 			
 			$.ajax({
 				url: "suppliers/"+supplier_id+"/contracts",
@@ -701,7 +698,106 @@
 			}
 		}
 		
+		function editContract(id, supplier_id){
+			showContractList(supplier_id,finishEditContract,[id, supplier_id]);
+		}
 		
+		function finishEditContract(arrIds){
+			var id=arrIds[0];
+			var supplier_id=arrIds[1];
+			var date = $("#contract_"+id+" .date").text();
+			var expDate = $("#contract_"+id+" .expiration_date").text();
+			var filed = $("#contract_"+id+" .filed").text();
+			$("#edit_contract_"+id).hide();
+			$("#del_contract_"+id).hide();
+			$("#file_contract_"+id).hide();
+			$("#del_file_contract_"+id).hide();
+			$("#save_contract_"+id).show();
+			$("#cancel_edit_contract_"+id).show();
+			//alert($("#contact_"+id+" .name").text());
+			$("#contract_"+id+" .date").html("<input type='text' id='contract_date_"+id+"' class='date_update col-sm-12'/>");
+			$("#contract_"+id+" .internal_number").html("<input type='text' value='"+$("#contract_"+id+" .internal_number").text()+"' class='internal_number_update col-sm-12'/>");
+			$("#contract_"+id+" .expiration_date").html("<input type='text' id='contract_expiration_date_"+id+"' class='expiration_date_update col-sm-12'/>");
+			$("#contract_"+id+" .object").html("<input type='text' value='"+$("#contract_"+id+" .object").text()+"' class='object_update col-sm-12'/>");
+			$("#contract_"+id+" .payment_term").html("<input type='text' value='"+$("#contract_"+id+" .payment_term").text()+"' class='payment_term_update col-sm-12'/>");
+			
+			$("#contract_"+id+" .filed").html("<select class='filed_update col-sm-12'><option "+
+					(filed=="to sign"?"selected":"")+
+					">to sign</option><option "+
+					(filed=="signed"?"selected":"")+
+					">signed</option><option "+
+					(filed=="filed"?"selected":"")+
+					">filed</option></select>");
+			
+			$("#contract_"+id+" .undefinite").html("<input type='checkbox' "+
+					($("#contract_"+id+" .undefinite").text()=="true"?"checked":"")+
+					" class='undefinite_update col-sm-12'/>");
+			$("#contract_"+id+" .do_not_renew").html("<input type='checkbox' "+
+					($("#contract_"+id+" .do_not_renew").text()=="true"?"checked":"")+
+					" class='do_not_renew_update col-sm-12'/>");
+
+			$("#contract_date_"+id).datepicker({ dateFormat: 'dd.mm.yy' });
+			if(date!=""){
+				$("#contract_date_"+id).datepicker("setDate",$.datepicker.parseDate("dd.mm.yy", date));
+			}
+			
+			$("#contract_expiration_date_"+id).datepicker({ dateFormat: 'dd.mm.yy' });
+			if(expDate!=""){
+				$("#contract_expiration_date_"+id).datepicker("setDate",$.datepicker.parseDate("dd.mm.yy", expDate));
+			}
+			
+			$("#contract_expiration_date_"+id).datepicker();
+		}
+		
+		function cancelEditContract(id, supplier_id){
+			$("#edit_contract_"+id).show();
+			$("#del_contract_"+id).show();
+			$("#file_contract_"+id).show();
+			$("#del_file_contract_"+id).show();
+			$("#save_contract_"+id).hide();
+			$("#cancel_edit_contract_"+id).hide();
+			showContractList(supplier_id);
+		}
+		
+		function saveContract(id, supplier_id){
+			var rez=validateContract($("#contract_date_"+id), 
+					$("#contract_expiration_date_"+id),
+					$("#supplier_contracts_"+supplier_id+" .undefinite_update"),
+					$("#supplier_contracts_"+supplier_id+" .internal_number_update"),
+					$("#supplier_contracts_"+supplier_id+" .payment_term_update"));
+			if(!rez){
+				return false;
+			}
+			
+			contract={};
+			contract.id = id;
+			contract.supplierId = supplier_id;
+			contract.expirationDate = rez.expDate;
+			contract.contractDate = rez.date;
+			contract.undefinite = rez.undefinite;
+			contract.internalNumber = rez.internalNumber;
+			contract.contractObject = $("#supplier_contracts_"+supplier_id+" .object_update").val();
+			contract.paymentTerm = rez.paymentTerm;
+			contract.undefinite = rez.undefinite;
+			contract.filed = $("#supplier_contracts_"+supplier_id+" .filed_update").val();
+			contract.doNotRenew = $("#supplier_contracts_"+supplier_id+" .do_not_renew_update").is(':checked');
+			
+			$.ajax({
+				url: "contracts/"+id,
+				type:"PUT",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				cache:false,
+				data:JSON.stringify(contract),
+				processData:false,
+				success:function(data){
+					showContractList(supplier_id);
+				},
+				error: function(data){
+					alert(data.responseText);
+					console.log(data);
+				}
+			});
+		}
 		
 	</script>
 </body>

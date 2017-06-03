@@ -1,11 +1,12 @@
 package org.clepcea.controllers;
 
-import java.io.BufferedInputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -15,13 +16,14 @@ import org.clepcea.services.ContractService;
 import org.clepcea.services.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -47,14 +49,16 @@ public class ContractController {
 	@ResponseBody
 	public Object saveContract(@RequestBody Contract contract, HttpServletResponse response){
 		logger.info("saveContact Called");		
+		Contract c = contractService.getContractById(contract.getId());
+		contract.setSupplier(c.getSupplier());
 		contractService.saveContract(contract);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;
 	}
 	
 	@RequestMapping(value="/{id}/file",method=RequestMethod.POST)
-	public Object  addScan(@RequestParam MultipartFile file,  @PathVariable long id,HttpServletResponse response){
-		logger.info("Allocate file to contract called with "+fileUploadService.getFileExtension(file.getOriginalFilename()));		
+	public Object  addScan(@RequestParam MultipartFile file,  @PathVariable long id,HttpServletResponse response) {
+		logger.info("Allocate file to contract called with "+fileUploadService.getFileExtension(file.getOriginalFilename()));			
 		Contract c = contractService.getContractById(id);
 		String fileName = null;
 		if(c!=null){
@@ -64,7 +68,7 @@ public class ContractController {
 				if(f!=null){
 					fileUploadService.deleteUploadedFile(f);
 				}
-				fileName = fileUploadService.uploadFile(file, "contracts", ""+id+"."+fileUploadService.getFileExtension(file.getOriginalFilename()));
+				fileName = fileUploadService.uploadFile(file, "contracts", ""+id+"."+fileUploadService.getFileExtension(file.getOriginalFilename()));				
 			}catch(NullPointerException npex){				
 				err=npex.getMessage();
 			}catch(IOException ioex){
@@ -76,7 +80,7 @@ public class ContractController {
 					response.getWriter().print(err);
 					response.flushBuffer();
 					return null;
-				}catch(IOException ioex){}
+				}catch(IOException ioex){return null;}
 			}
 		}
 		
@@ -139,7 +143,7 @@ public class ContractController {
 					response.flushBuffer();
 					return;
 				}
-			
+				response.addHeader("Content-Disposition ", "attachment;filename=\""+c.getOriginalFileName()+"\"");
 				InputStream is = new FileInputStream(scanFile);
 				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
 			}catch(IOException ioex){
