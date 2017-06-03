@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 @Entity
 @Table(name="CONTACTS")
@@ -34,6 +36,7 @@ public class Contact implements java.io.Serializable{
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="SUPPLIERS_ID", nullable=false)
+	@JsonBackReference
 	private Supplier supplier;
 	
 	public long getId() {

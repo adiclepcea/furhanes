@@ -26,10 +26,10 @@ public class Supplier implements java.io.Serializable{
 	
 	private String name, cui, address,j,bank,iban,swift,phone,fax,mail;
 	
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="supplier")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="supplier")
 	private List<Contact> contacts;
 	
-	@OneToMany(fetch=FetchType.EAGER, mappedBy="supplier")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="supplier")
 	private List<Contract> contracts;
 	
 	public List<Contract> getContracts() {

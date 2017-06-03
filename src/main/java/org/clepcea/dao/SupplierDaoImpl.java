@@ -1,16 +1,23 @@
 package org.clepcea.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.clepcea.model.Contact;
 import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class SupplierDaoImpl implements SupplierDao {
@@ -37,16 +44,24 @@ public class SupplierDaoImpl implements SupplierDao {
 	}
 
 	@Override
-	public List<Supplier> list(int start, int count) {
+	@Transactional
+	public List<Supplier> list(int start, int count,HashMap<String, Object> filter) {
 		Session session = sessionFactory.openSession();
-		Query qry = session.createQuery("from Supplier"); 
-		if(count>0){
-			qry.setFirstResult(start);
-			qry.setMaxResults(count);
-		}
-		List<Supplier> lst = qry.list();
 		
-		session.close();
+		Criteria crit = session.createCriteria(Supplier.class);
+		if(filter!=null){
+			crit.add(Restrictions.ilike("name", "%"+filter.get("name").toString()+"%"));
+			crit.setMaxResults(count);
+			crit.setFirstResult(start);
+		}
+		crit.addOrder(Order.asc("name"));
+		List<Supplier> lst = crit.list();
+		
+		for(Supplier s : lst){
+			s.getContacts().size();
+			s.getContracts().size();
+		}
+		session.close();		
 		return lst;
 	}
 
@@ -72,12 +87,14 @@ public class SupplierDaoImpl implements SupplierDao {
 		return supplier;
 	}
 	@Override
+	@Transactional
 	public List<Contact> contactListBySupplierId(long id) {
 		Session session = sessionFactory.openSession();
 		Query query = session.createQuery("from Supplier where id=:id");
 		query.setParameter("id", id);	
 		Supplier supplier = (Supplier)query.uniqueResult();
 		List<Contact> contacts = supplier.getContacts();
+		contacts.size();
 		session.close();
 		return contacts;
 	}
@@ -94,12 +111,14 @@ public class SupplierDaoImpl implements SupplierDao {
 		session.close();
 	}
 	@Override
+	@Transactional
 	public List<Contract> contractListBySupplierId(long id) {
 		Session session = sessionFactory.openSession();
 		Query query = session.createQuery("from Supplier where id=:id");
 		query.setParameter("id", id);	
 		Supplier supplier = (Supplier)query.uniqueResult();
 		List<Contract> contracts = supplier.getContracts();
+		contracts.size();
 		session.close();
 		return contracts;
 	}

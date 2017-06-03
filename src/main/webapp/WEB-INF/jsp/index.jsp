@@ -161,9 +161,20 @@
 			showSuppliersList();
 		}
 		
-		function showSuppliersList(){			
+		function filterSuppliers(){
+			showSuppliersList($("#supplier_filter").val());
+		}
+		
+		function showSuppliersList(name){
+			passData = {}
+			passData.startFrom = startPositionSupplier;
+			passData.count = countPositionsSupplier;
+			if(name){
+				passData.name = name;
+			}
 			$.ajax({
-				url:"suppliers/list?startFrom="+startPositionSupplier+"&count="+countPositionsSupplier,
+				url:"suppliers/list",
+				data: passData,
 				error:function(err){
 					if(err.hasOwnProperty("status") && err.status==403 ||err.status==401){
 						window.location.replace(".");//"${loginUrl}?error=Please%20login%20to%20access%20this%20area");
@@ -176,6 +187,28 @@
 				$("#container").html(data);
 				$(".menu-item").removeClass("active");
 				$("#mnuSuppliers").addClass("active");
+				$("#supplier_filter").autocomplete({
+					source: function(request, response){
+						$.ajax({
+							url:"v1/suppliers/filter",	
+							headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+							type: "GET",
+							data:{name:request.term},
+							success: function(data){								
+								response($.map(data,function(item){
+									return{
+										label:item.name,
+										value:item.name
+									}
+								}));
+							},
+							error: function(err){
+								console.log(err);
+							}
+						});
+					},	
+					minLength: 2
+				});
 			});
 			
 		}
@@ -223,7 +256,7 @@
 			console.log("Saving: "+JSON.stringify(supplier));
 			
 			$.ajax({
-				url:("suppliers/"+((supplier.id==0)?"":supplier.id)),
+				url:("v1/suppliers/"+((supplier.id==0)?"":supplier.id)),
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
 				type: ((supplier.id==0)?"POST":"PUT"),
 				contentType: "application/json; charset=utf-8",
@@ -273,7 +306,7 @@
 		function addSupplier(){
 			if(!$("#supplierAddDiv").is(":visible")){
 				$("#supplierAddDiv").show();
-				$("#btnAddSupplier").hide();
+				$("#supplierHeader").hide();
 				$("#btnCancelAddSupplier").show();
 				$("#suppliersList").hide();
 				$.ajax({
@@ -295,7 +328,7 @@
 		
 		function closeAddSupplier(){
 			$("#supplierAddDiv").hide();
-			$("#btnAddSupplier").show();
+			$("#supplierHeader").show();
 			$("#btnCancelAddSupplier").hide();
 			$("#suppliersList").show();
 		}
@@ -303,7 +336,7 @@
 		function deleteSupplier(id,name){
 			if(confirm("Are you sure you want to delete the selected supplier?")){
 				$.ajax({
-					url:"suppliers/"+id,
+					url:"v1/suppliers/"+id,
 					type:"DELETE",
 					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 					error:function(err){
@@ -373,7 +406,7 @@
 			}
 			
 			$.ajax({
-				url:"suppliers/"+id+"/contacts",
+				url:"v1/suppliers/"+id+"/contacts",
 				type: "POST",
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
 				contentType: "application/json; charset=utf-8",
@@ -405,7 +438,7 @@
 				return;
 			}
 			$.ajax({
-				url:"contacts/"+id,
+				url:"v1/contacts/"+id,
 				type: "DELETE",
 				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 				error:function(err){
@@ -462,7 +495,7 @@
 			contact.fax = $("#contact_"+id+" .fax_update").val();
 			
 			$.ajax({
-				url:"contacts/"+id,
+				url:"v1/contacts/"+id,
 				type: "PUT",
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
 				contentType: "application/json; charset=utf-8",
@@ -589,7 +622,7 @@
 			contract.observations = $("#supplier_contracts_"+supplier_id+"contract_new_observations").val();
 			
 			$.ajax({
-				url: "suppliers/"+supplier_id+"/contracts",
+				url: "v1/suppliers/"+supplier_id+"/contracts",
 				type:"POST",
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
 				cache:false,
@@ -612,7 +645,7 @@
 				$("#supplier_contracts_"+supplier_id+" #messageDiv").attr("class","alert alert-info");
 				$("#supplier_contracts_"+supplier_id+" #messageDiv").html("Please wait while the file is being deleted");
 				$.ajax({
-					url:"contracts/"+id+"/file",
+					url:"v1/contracts/"+id+"/file",
 					type:"DELETE",
 					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 					success: function(data){
@@ -681,7 +714,7 @@
 		function deleteContract(id, supplier_id){
 			if(confirm("Are you sure you want to delete the selected contract?")){
 				$.ajax({
-					url:"contracts/"+id,
+					url:"v1/contracts/"+id,
 					type:"DELETE",
 					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 					success: function(data){
@@ -783,7 +816,7 @@
 			contract.doNotRenew = $("#supplier_contracts_"+supplier_id+" .do_not_renew_update").is(':checked');
 			
 			$.ajax({
-				url: "contracts/"+id,
+				url: "v1/contracts/"+id,
 				type:"PUT",
 				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
 				cache:false,
