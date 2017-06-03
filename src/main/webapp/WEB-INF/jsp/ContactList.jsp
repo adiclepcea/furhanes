@@ -2,7 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-
+<fieldset>
+<legend>Contacts</legend>
 <div>
 	<input type="hidden" id="supplier_id" value="${supplier_id}">
 	<input type="hidden" id="no_of_contacts" value="${contacts.size()}">
@@ -16,11 +17,11 @@
 	<input type="text" id="contact_new_mobile" name="contact_new_mobile" class="col-sm-1" placeholder="Mobile"/>
 	<input type="text" id="contact_new_fax" name="contact_new_fax" class="col-sm-1" placeholder="Fax"/>
 	<input type="hidden" id="contact_new_obs" name="contact_new_obs"/>
-	<button class="btn btn-sm btn-success col-sm-1" onclick="addContactToSupplier(${supplier_id})" style="margin:5px 0px 0px 5px">Add contact</button>
+	<button class="btn btn-sm btn-success" onclick="addContactToSupplier(${supplier_id})" style="margin:5px 0px 0px 5px"><span class="glyphicon glyphicon-plus"></span></button>
 	
 	<table class="table table-condensed table-hover">
 		<thead>
-			<tr><td>Name</td><td>Surname</td><td>Title</td><td>Function</td><td>E-mail</td><td>Mobile</td><td>Phone</td><td>Fax</td></tr>
+			<tr><th>Name</th><th>Surname</th><th>Title</th><th>Function</th><th>E-mail</th><th>Mobile</th><th>Phone</th><th>Fax</th></tr>
 		</thead>
 		<tbody>
 			<c:forEach var="contact" items="${contacts }">
@@ -45,3 +46,4 @@
 		</tbody>
 	</table>
 </div>
+</fieldset>
