@@ -15,6 +15,8 @@ import javax.persistence.Transient;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name="Contracts")
 public class Contract implements Serializable{
@@ -37,6 +39,7 @@ public class Contract implements Serializable{
 	private long id;
 	@ManyToOne
 	@JoinColumn(name="SUPPLIERS_ID",nullable=false)
+	@JsonBackReference
 	private Supplier supplier;
 	@Column(name="CONTRACT_DATE")
 	private Date contractDate;

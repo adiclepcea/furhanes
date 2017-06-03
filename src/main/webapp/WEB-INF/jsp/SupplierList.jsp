@@ -4,12 +4,15 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 	<div>
-		<button id="btnAddSupplier" class="btn btn-md btn-success" onclick="addSupplier()">Add supplier</button>
-		<button id="btnCancelAddSupplier" class="btn btn-md btn-warning" onclick="closeAddSupplier()" style="display:none">Close add supplier</button>
-		<div>
-		<div id="supplierAddDiv" style="display:none">
-			<h4>Add a supplier</h4>
+		<div id="supplierHeader"><button id="btnAddSupplier" class="btn btn-md btn-success" onclick="addSupplier()">Add supplier</button>
+			<input type="text" id="supplier_filter"/>
+			<button id="btnFilter" class="btn btn-md btn-info" onclick="filterSuppliers()"><span class="glyphicon glyphicon-search"></span></button>filter="${filter}"
 		</div>
+		<button id="btnCancelAddSupplier" class="btn btn-md btn-warning" onclick="closeAddSupplier()" style="display:none">Close add supplier</button>		
+		<div>
+			<div id="supplierAddDiv" style="display:none">
+				<h4>Add a supplier</h4>
+			</div>
 		</div>
 	</div>
 	

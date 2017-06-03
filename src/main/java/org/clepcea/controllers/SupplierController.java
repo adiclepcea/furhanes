@@ -1,15 +1,11 @@
 package org.clepcea.controllers;
 
+import java.util.HashMap;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.clepcea.model.Contact;
-import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
 import org.clepcea.services.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +13,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value="/suppliers")
@@ -46,50 +39,34 @@ public class SupplierController {
 		model.addAttribute("supplier",supplier);
 		return "SupplierForm";
 	}
-		
-	@RequestMapping(value="/", method=RequestMethod.POST, consumes="application/json",produces="application/json")
-	@ResponseBody
-	public Supplier saveSupplier(@RequestBody Supplier supplier){
-		logger.info("Create supplier called");
-		supplierService.saveSupplier(supplier);
-		return supplier;
-	}
-	
-	@RequestMapping(value="/{id}",method=RequestMethod.GET)
-	public String getSupplier(HttpSession session, @PathVariable long id){
-		return "";
-	}
 	
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public String filterSuppliers(ModelMap model,
 			@RequestParam(value="startFrom",  required=false) Integer startFrom,
-			@RequestParam(value="count",  required=false) Integer count){
+			@RequestParam(value="count",  required=false) Integer count,
+			@RequestParam(value="name", required=false) String name){
+		
+		logger.info("list suppliers called ");
 		
 		if(startFrom==null){
 			startFrom = 0;
 		}
+		
 		if(count==null){
 			count = 0;
 		}
-		logger.info("list suppliers called "+startFrom+", count="+count);
-		model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null));
+		
+		if(name!=null){
+			HashMap<String, Object> filter = new HashMap<>();
+			filter.put("name", name);
+			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, filter));
+			model.addAttribute("filter",name);
+		}else{
+			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null));
+			model.addAttribute("filter","no filter");
+		}
+		
 		return "SupplierList";
-	}
-	
-	@RequestMapping(value="/{id}",method=RequestMethod.DELETE)
-	public Object deleteSupplier(@PathVariable long id,HttpServletResponse response){
-		logger.info("Delete supplier called");
-		supplierService.deleteSupplierById(id);
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
-	}
-	
-	@RequestMapping(value="/{id}",method=RequestMethod.PUT)
-	@ResponseBody
-	public Supplier modifySupplier(@RequestBody Supplier supplier, @PathVariable long id){
-		logger.info("Modify supplier called");
-		supplierService.saveSupplier(supplier);
-		return supplier;
 	}
 	
 	@RequestMapping(value="/{id}/contacts",method=RequestMethod.GET)
@@ -99,26 +76,11 @@ public class SupplierController {
 		 return "ContactList";
 	}
 	
-	@RequestMapping(value="/{id}/contacts",method=RequestMethod.POST)
-	public Object  addContact(@RequestBody Contact contact,  @PathVariable long id,HttpServletResponse response){
-		logger.info("Add contact to supplier called");
-		supplierService.addContactBySupplierId(id, contact);
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
-	}
 	@RequestMapping(value="/{id}/contracts",method=RequestMethod.GET)
 	public String getContracts(ModelMap model, @PathVariable long id){
 		 model.addAttribute("contracts",supplierService.listContractsBySupplierId(id));
 		 model.addAttribute("supplier_id",id);
 		 return "ContractList";
-	}
-	
-	@RequestMapping(value="/{id}/contracts",method=RequestMethod.POST)
-	public Object  addContract(@RequestBody Contract contract,  @PathVariable long id,HttpServletResponse response){
-		logger.info("Add contract to supplier called");
-		supplierService.addContractBySupplierId(id, contract);
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
 	}
 	
 }

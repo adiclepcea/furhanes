@@ -63,7 +63,7 @@ public class SupplierServiceImpl implements SupplierService{
 
 	@Override
 	public List<Supplier> listSuppliers(int start, int count, HashMap<String, Object> filter) {
-		return supplierDao.list(start,count);
+		return supplierDao.list(start,count,filter);
 	}
 
 	@Override

@@ -40,7 +40,6 @@
 					<button class="btn btn-sm btn-info" onclick="showContact(${contact.id},${supplier_id })" id="cancel_edit_contact_${contact.id}" style="display:none">Cancel</button>
 					<button class="btn btn-sm btn-success" onclick="saveContact(${contact.id},${supplier_id})" id="save_contact_${contact.id}" style="display:none">Save</button>
 				</td>
-				<td>${contact.fax }</td>
 			</tr>
 			</c:forEach>
 		</tbody>
