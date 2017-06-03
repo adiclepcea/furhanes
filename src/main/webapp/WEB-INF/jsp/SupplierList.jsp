@@ -27,7 +27,17 @@
 				id="supplier_header_${supplier.id}"  
 				onclick="populateSupplierEdit(${supplier.id})"
 				style="cursor:pointer; cursor:hand">
-				${supplier.name}
+				<c:choose>
+					<c:when test="${supplier.hasExpiredContracts()}">
+						<span class="alert-danger glyphicon glyphicon-time"></span>
+					</c:when>
+					<c:otherwise>
+						<c:if test="${supplier.hasContractsThatExpireIn(20)}">
+							<span class="alert-warning glyphicon glyphicon-time"></span>	
+						</c:if>
+					</c:otherwise>				
+				</c:choose>	
+				${supplier.name}			
 			</h4>
 			
 			<div class="list-group-item-text row">

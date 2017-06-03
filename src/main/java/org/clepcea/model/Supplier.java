@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+
 @Entity
 @Table(name="SUPPLIERS")
 public class Supplier implements java.io.Serializable{
@@ -136,5 +139,36 @@ public class Supplier implements java.io.Serializable{
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	
+	public boolean hasContractsThatExpireIn(int days){		
+		return contracts.stream()
+				.filter(
+						(contract)->(contract.getExpirationDate()!=null && 
+								!contract.isUndefinite() && 
+								!contract.isDoNotRenew() && 
+								Days.daysBetween(
+										new DateTime(), 
+										new DateTime(contract.getExpirationDate().getTime())
+									).getDays()<days)						
+						).filter(contract->
+							Days.daysBetween(
+									new DateTime(), 
+									new DateTime(contract.getExpirationDate().getTime())
+								).getDays()>0)
+				.findAny().isPresent();
+	}
+	
+	public boolean hasExpiredContracts(){
+		return contracts.stream()
+			.filter(
+					(contract)->(contract.getExpirationDate()!=null && 
+							!contract.isUndefinite() && 
+							!contract.isDoNotRenew() && 
+							contract.getExpirationDate().before(new java.util.Date())
+								)
+					)
+			.findAny().isPresent();		
+	}
 
 }
+
