@@ -140,33 +140,15 @@ public class Supplier implements java.io.Serializable{
 		this.address = address;
 	}
 	
-	public boolean hasContractsThatExpireIn(int days){		
+	public boolean hasContractsToRenewInDays(int days){		
 		return contracts.stream()
-				.filter(
-						(contract)->(contract.getExpirationDate()!=null && 
-								!contract.isUndefinite() && 
-								!contract.isDoNotRenew() && 
-								Days.daysBetween(
-										new DateTime(), 
-										new DateTime(contract.getExpirationDate().getTime())
-									).getDays()<days)						
-						).filter(contract->
-							Days.daysBetween(
-									new DateTime(), 
-									new DateTime(contract.getExpirationDate().getTime())
-								).getDays()>0)
+				.filter((contract)->(contract.mustRenewInDays(days)))
 				.findAny().isPresent();
 	}
 	
-	public boolean hasExpiredContracts(){
+	public boolean hasContractsToRenew(){
 		return contracts.stream()
-			.filter(
-					(contract)->(contract.getExpirationDate()!=null && 
-							!contract.isUndefinite() && 
-							!contract.isDoNotRenew() && 
-							contract.getExpirationDate().before(new java.util.Date())
-								)
-					)
+			.filter((contract)->(contract.mustRenew()))
 			.findAny().isPresent();		
 	}
 

@@ -27,6 +27,16 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 	@Autowired
 	private FileUploadService fileUploadService;
 	
+	@RequestMapping(value="/{id}", method=RequestMethod.GET)
+	@ResponseBody
+	public Object getContract(@PathVariable long id, HttpServletResponse response){
+		logger.info("getContract Called");		
+		Contract c = contractService.getContractById(id);
+		c.setMustRenew(c.mustRenew());
+		c.setMustRenewInDays(c.mustRenewInDays(20));
+		return c;
+	}
+	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public Object deleteContract(@PathVariable long id, HttpServletResponse response){
 		logger.info("deleteContract Called");

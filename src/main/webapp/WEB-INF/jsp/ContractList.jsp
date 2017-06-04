@@ -6,11 +6,16 @@
 
 <fieldset>
 <legend>Contracts</legend>
+<div style="${supplier_id!=0?"display:none":""}">
+	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpired">Filter expired</label>
+	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpiring">Filter expiring</label>
+</div>
 <div>
+	<c:if test="${supplier_id!=0 }">
 		<div class="col-sm-12" style="margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px">
 			<input type="hidden" id="supplier_id" value="${supplier_id}">
 			<input type="hidden" id="no_of_contracts" value="${contracts.size()}">
-			
+			<div class="col-sm-1"></div>
 			<input type="text" id="contract_new_date_${supplier_id }" name="contract_new_date" class="col-sm-1" placeholder="Contract date"/>
 			<input type="text" id="contract_new_internal_number" name="contract_new_internal_number" class="col-sm-1" placeholder="Internal No"/>
 			<input type="text" id="contract_new_expiration_date_${supplier_id }" name="contract_new_expiration_date" class="col-sm-1" placeholder="Expires on"/>
@@ -32,22 +37,33 @@
 		name="${_csrf.parameterName}"
 		value="${_csrf.token}" />
 		</div>
+	</c:if>
 	<div id="messageDiv" class="col-sm-12" style="display:none">Please wait while uploading the file</div>
 	<table class="table table-condensed table-hover">
 		<thead>
-			<tr><th>Date</th><th>Internal no</th><th>Expires on</th><th>Contract object</th><th>Payment term  (days)</th><th>Status</th><th>Undefinite</th><th>Do not renew</th><th>Scanned file</th></tr>
+			<tr>
+			<th>
+			<c:if test="${supplier_id==0 }">
+				Supplier
+			</c:if>
+			</th>
+			<th>Date</th><th>Internal no</th><th>Expires on</th><th>Contract object</th><th>Payment term  (days)</th><th>Status</th><th>Undefinite / Do not renew</th><th>Scanned file</th></tr>
 		</thead>
 		<tbody>
 			<c:forEach var="contract" items="${contracts }">
-			<tr id="contract_${contract.id}">
+			<tr id="contract_${contract.id}" class="${contract.mustRenew()?"alert-danger":(contract.mustRenewInDays(20)?"alert-warning":"") }">
+				<td class="col-sm-1">
+				<c:if test="${supplier_id==0 }">
+					${contract.supplier.name }
+				</c:if>
+				</td>
 				<td class="col-sm-1"><span class="date"><fmt:formatDate pattern = "dd.MM.yyyy" value = "${contract.contractDate }" /></span></td>
 				<td class="col-sm-1"><span class="internal_number">${contract.internalNumber }</span></td>
 				<td class="col-sm-1"><span class="expiration_date"><fmt:formatDate pattern = "dd.MM.yyyy" value = "${contract.expirationDate }" /></span></td>
 				<td class="col-sm-2"><span class="object">${contract.contractObject }</span></td>
 				<td class="col-sm-1"><span class="payment_term">${contract.paymentTerm }</span></td>
 				<td class="col-sm-1"><span class="filed">${contract.filed }</span></td>
-				<td class="col-sm-1"><span class="undefinite">${contract.undefinite }</span></td>				
-				<td class="col-sm-1"><span class="do_not_renew">${contract.doNotRenew }</span></td>
+				<td class="col-sm-1"><span class="undefinite col-sm-5">${contract.undefinite }</span><span class="separator col-sm-1"></span><span class="do_not_renew col-sm-6">${contract.doNotRenew }</span></td>
 				<td class="col-sm-1"><span class="scan">
 					<c:if test="${contract.originalFileName!=null }">
 						<button class="btn btn-sm btn-danger" id="del_file_contract_${contract.id }" onclick="deleteContractFile(${contract.id},${supplier_id})">
@@ -69,7 +85,7 @@
 						id="frm_supplier_contracts_${contract.id }"
 						enctype="multipart/form-data" 
 						action="<spring:url value='/suppliers/${supplier_id }/contracts'/>">
-						<input id="contract_upload_${contract.id }" type="file" name="file" style="display:none" onchange="uploadContractFile(${contract.id },${supplier_id },this.files)"/>
+						<input style="width:0px;height:0px" id="contract_upload_${contract.id }" type="file" name="file" style="display:none" onchange="uploadContractFile(${contract.id },${supplier_id },this.files)"/>
 					</form>
 				</td>
 				<td>${contact.fax }</td>				

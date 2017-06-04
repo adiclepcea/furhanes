@@ -16,6 +16,7 @@ import org.clepcea.services.ContractService;
 import org.clepcea.services.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,25 +37,6 @@ public class ContractController {
 	@Autowired
 	private FileUploadService fileUploadService;
 	
-	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
-	public Object deleteContract(@PathVariable long id, HttpServletResponse response){
-		logger.info("deleteContract Called");
-		deleteScan(id, response);
-		contractService.deleteContractById(id);
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
-	}
-	
-	@RequestMapping(value="/{id}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
-	@ResponseBody
-	public Object saveContract(@RequestBody Contract contract, HttpServletResponse response){
-		logger.info("saveContact Called");		
-		Contract c = contractService.getContractById(contract.getId());
-		contract.setSupplier(c.getSupplier());
-		contractService.saveContract(contract);
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
-	}
 	
 	@RequestMapping(value="/{id}/file",method=RequestMethod.POST)
 	public Object  addScan(@RequestParam MultipartFile file,  @PathVariable long id,HttpServletResponse response) {
@@ -94,44 +76,8 @@ public class ContractController {
 		return null;
 	}
 	
-	@RequestMapping(value="/{id}/file",method=RequestMethod.DELETE)
-	public Object  deleteScan(@PathVariable long id,HttpServletResponse response){
-		logger.info("Delete  contract file called");		
-		Contract c = contractService.getContractById(id);
-		String f = null;
-		if(c!=null){
-			f = c.getScanFile();
-			String err = null;
-			try{
-				if(f!=null){
-					fileUploadService.deleteUploadedFile(f);
-				}
-			}catch(NullPointerException npex){				
-				err=npex.getMessage();
-			}catch(IOException ioex){
-				err="Could not delete the file";
-			}
-			if(err!=null){
-				try{
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					response.getWriter().print(err);
-					response.flushBuffer();
-					return null;
-				}catch(IOException ioex){}
-			}
-		}
-		
-		if(f!=null){
-			c.setOriginalFileName(null);
-			c.setScanFile(null);
-			contractService.saveContract(c);
-		}
-		
-		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-		return null;
-	}
 	@RequestMapping(value="{id}/download", method=RequestMethod.GET)
-	public void getContractFile(@PathVariable long id, HttpServletResponse response){
+	public void getScantFile(@PathVariable long id, HttpServletResponse response){
 		Contract c = contractService.getContractById(id);
 		String fileName = c.getScanFile(); 
 		if(fileName!=null){
@@ -151,6 +97,25 @@ public class ContractController {
 				logger.warn(ioex.getMessage());
 			}
 		}
-		
 	}
+	
+	@RequestMapping(value="list", method=RequestMethod.GET)
+	public String getContractList(ModelMap model,
+			@RequestParam(value="startFrom",  required=false) Integer startFrom,
+			@RequestParam(value="count",  required=false) Integer count,
+			@RequestParam(value="order", required=false) String order,
+			@RequestParam(value="expired", required=false) Boolean expired,
+			@RequestParam(value="toExpire", required=false) Boolean toExpire){
+			
+		model.addAttribute("supplier_id",0);
+		if(startFrom==null){
+			startFrom=0;
+		}
+		if(count==null){
+			count=0;
+		}
+		model.addAttribute("contracts", contractService.listContracts(startFrom, count, null));
+		return "ContractList";
+	}
+	
 }

@@ -13,9 +13,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.joda.time.Days;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javassist.convert.TransformNew;
 
 @Entity
 @Table(name="Contracts")
@@ -32,6 +35,41 @@ public class Contract implements Serializable{
 	public void setFile(MultipartFile file) {
 		this.file = file;
 	}
+	
+	public boolean isExpired(){
+		return getExpirationDate().before((new Date()));
+	}
+	
+	public boolean isAboutToExpireInDays(int days){
+		return getExpirationDate().getTime()-(1000*3600*24*days)<=(new Date()).getTime();
+	}
+	
+	public boolean mustRenew(){
+		return !this.doNotRenew && !this.undefinite && isExpired();
+	}
+	
+	public boolean mustRenewInDays(int days){
+		return !this.doNotRenew && !this.undefinite && isAboutToExpireInDays(days);
+	}
+	
+	@Transient
+	private boolean mustRenew;
+	public boolean isMustRenew() {
+		return mustRenew;
+	}
+	public void setMustRenew(boolean mustRenew) {
+		this.mustRenew = mustRenew;
+	}
+	@Transient
+	private boolean mustRenewInDays;
+	
+	public boolean isMustRenewInDays() {
+		return mustRenewInDays;
+	}
+	public void setMustRenewInDays(boolean mustRenewInDays) {
+		this.mustRenewInDays = mustRenewInDays;
+	}
+	
 	private static final long serialVersionUID = 3765615611879474697L;
 	@Id
 	@Column(name="ID")

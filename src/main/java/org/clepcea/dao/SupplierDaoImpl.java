@@ -1,5 +1,6 @@
 package org.clepcea.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public class SupplierDaoImpl implements SupplierDao {
 		Query query = session.createQuery("from Supplier where id=:id");
 		query.setParameter("id", id);	
 		Supplier supplier = (Supplier)query.uniqueResult();
-		List<Contact> contacts = supplier.getContacts();
+		List<Contact> contacts = supplier==null?new ArrayList<Contact>():supplier.getContacts();
 		contacts.size();
 		session.close();
 		return contacts;
@@ -117,7 +118,7 @@ public class SupplierDaoImpl implements SupplierDao {
 		Query query = session.createQuery("from Supplier where id=:id");
 		query.setParameter("id", id);	
 		Supplier supplier = (Supplier)query.uniqueResult();
-		List<Contract> contracts = supplier.getContracts();
+		List<Contract> contracts = supplier==null?new ArrayList<Contract>():supplier.getContracts();
 		contracts.size();
 		session.close();
 		return contracts;
