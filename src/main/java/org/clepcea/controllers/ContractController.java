@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -17,14 +19,10 @@ import org.clepcea.services.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -99,22 +97,41 @@ public class ContractController {
 		}
 	}
 	
+	private boolean isInteger(String str){
+		return str.matches("^[0-9]{1,10}$");
+	}
+	
 	@RequestMapping(value="list", method=RequestMethod.GET)
 	public String getContractList(ModelMap model,
-			@RequestParam(value="startFrom",  required=false) Integer startFrom,
-			@RequestParam(value="count",  required=false) Integer count,
-			@RequestParam(value="order", required=false) String order,
-			@RequestParam(value="expired", required=false) Boolean expired,
-			@RequestParam(value="toExpire", required=false) Boolean toExpire){
-			
+			//@RequestParam(value="startFrom",  required=false) Integer startFrom,
+			//@RequestParam(value="count",  required=false) Integer count,
+			//@RequestParam(value="order", required=false) String order,
+			@RequestParam Map<String, Object> filter){
+		
+		int startFrom=0;
+		int count=0;
 		model.addAttribute("supplier_id",0);
-		if(startFrom==null){
-			startFrom=0;
+		//if(startFrom==null){
+		//	startFrom=0;
+		//}
+		//if(count==null){
+		//	count=0;
+		//}
+		Map<String,Object> passFilter=null;
+		if(filter!=null){
+			logger.info(filter);			
+			if(filter.containsKey("startFrom") && isInteger(filter.get("startFrom").toString())){
+				startFrom = Integer.parseInt(filter.get("startFrom").toString());
+			}
+			if(filter.containsKey("count") && isInteger(filter.get("count").toString())){
+				count = Integer.parseInt(filter.get("count").toString());
+			}
+			passFilter = filter.entrySet().stream().filter(it->it.getKey().equals("expired") || it.getKey().equals("expiring")).collect(Collectors.toMap(it->it.getKey(),it->it.getValue()));
+			
 		}
-		if(count==null){
-			count=0;
-		}
-		model.addAttribute("contracts", contractService.listContracts(startFrom, count, null));
+		model.addAttribute("contracts", contractService.listContracts(startFrom, count, passFilter));
+		model.addAttribute("expired", passFilter!=null && passFilter.containsKey("expired") && passFilter.get("expired").equals("true"));
+		model.addAttribute("expiring", passFilter!=null && passFilter.containsKey("expiring") && passFilter.get("expiring").equals("true"));
 		return "ContractList";
 	}
 	

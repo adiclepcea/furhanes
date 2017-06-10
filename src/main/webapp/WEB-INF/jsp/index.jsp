@@ -43,7 +43,7 @@
 	        	Suppliers<span class="caret"></span></a>
 	        	<ul class="dropdown-menu">
 	        		<li><a href="#" onclick="showSuppliersList()">Supplier list</a></li>
-	        		<li><a href="#" onclick="showContractList()">Contract list</a></li>
+	        		<li><a href="#" onclick="showContractsList()">Contract list</a></li>
 	        	</ul>
 	        </li>
 	        <li class="menu-item" id="mnuPOs"><a href="#" onclick="notYetImplemented('mnuPOs')">POs</a></li>
@@ -733,7 +733,7 @@
 						if(supplier_id){
 							showContractListForSupplier(supplier_id);
 						}else{
-							showContractList();
+							showContractsList();
 						}
 					},
 					error:function(err){
@@ -805,7 +805,7 @@
 		
 		function cancelEditContract(id, supplier_id){
 			/*if(supplier_id){
-				showContractListForSupplier(supplier_id);
+				showContractsListForSupplier(supplier_id);
 			}*/
 			repaintContract(id,supplier_id);
 		}
@@ -848,8 +848,8 @@
 					$("#contract_"+id+" .do_not_renew").text(data.doNotRenew);
 					if(data.originalFileName){
 						$("#contract_"+id+" .scan").html("<button class=\"btn btn-sm btn-danger\" id=\"del_file_contract_"+id+"\" onclick=\"deleteContractFile("+id+","+supplier_id+")\">"+
-						"<span class=\"glyphicon glyphicon-trash\"></span></button>"+					
-						"<a download=\""+data.originalFileName+"\" href=\"contracts/"+id+"/download'/>\" title=\""+id+"\">Download</a>");							
+						"<span class=\"glyphicon glyphicon-trash\"></span></button> "+					
+						"<a download=\""+data.originalFileName+"\" href=\"contracts/"+id+"/download\" title=\""+data.originalFileName+"\">Download</a>");							
 					}else{
 						$("#contract_"+id+" .scan").html("");
 					}
@@ -917,9 +917,13 @@
 			});
 		}
 		
-		function showContractList(order, filter,showExpired,showAboutToExpire){
+		function showContractsList(filter){
+			var url = "contracts/list?startFrom=0&count=10";
+			if(filter){
+				url+="&expired="+filter.expired+"&expiring="+filter.expiring;
+			}
 			$.ajax({
-				url:"contracts/list",
+				url:url,
 				type:"GET",
 				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 				error:function(err){
@@ -936,9 +940,18 @@
 					alert(err);
 				},
 				success: function(data,textStatus,xhr){
+					$(".menu-item").removeClass("active");
+					$("#mnuSuppliers").addClass("active");
 					$("#container").html(data);						
 				}
 			});
+		}
+		
+		function filterContracts(){
+			var filter={};
+			filter.expired=$("#chkContractsExpired").is(':checked');
+			filter.expiring=$("#chkContractsExpiring").is(':checked');
+			showContractsList(filter);
 		}
 		
 	</script>

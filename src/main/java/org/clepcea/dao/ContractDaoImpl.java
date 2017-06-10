@@ -1,6 +1,7 @@
 package org.clepcea.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.clepcea.model.Contract;
 import org.hibernate.Query;
@@ -28,9 +29,30 @@ public class ContractDaoImpl implements ContractDao {
 	}
 
 	@Override
-	public List<Contract> list(int start, int count) {
+	public List<Contract> list(int start, int count,Map<String, Object> filter) {
 		Session session = sessionFactory.openSession();
-		Query qry = session.createQuery("from Contract"); 
+		String hql = "from Contract ";
+		boolean filterExpireUsed = false; 
+		if(filter!=null){
+			if(filter.containsKey("expired") && filter.get("expired").equals("true")){
+				hql+="where expirationDate < current_date";
+				filterExpireUsed=true;
+			}
+			if(filter.containsKey("expiring") && filter.get("expiring").equals("true")){
+				if(filterExpireUsed){
+					hql+=" or expirationDate < current_date+20";
+				}else{
+					hql+="where expirationDate between current_date and current_date+20";
+					filterExpireUsed = true;
+				}
+				
+			}
+		}
+		if(filterExpireUsed){
+			hql+=" and doNotRenew=false and undefinite=false";
+		}
+		hql+=" order by supplier.name, contractDate";
+		Query qry = session.createQuery(hql);
 		if(count>0){
 			qry.setFirstResult(start);
 			qry.setMaxResults(count);

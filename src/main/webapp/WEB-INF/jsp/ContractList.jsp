@@ -7,8 +7,10 @@
 <fieldset>
 <legend>Contracts</legend>
 <div style="${supplier_id!=0?"display:none":""}">
-	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpired">Filter expired</label>
+	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpired"> Filter expired</label>
 	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpiring">Filter expiring</label>
+	<button class="btn btn-md btn-info" onclick="filterContracts()"><span class="glyphicon glyphicon-filter"></span></button>
+	filter by expired: "${expired }", filter by expiring: "${expiring }"
 </div>
 <div>
 	<c:if test="${supplier_id!=0 }">
@@ -29,6 +31,7 @@
 			<div class="col-sm-3">
 				<div class="checkbox-inline "><label><input type="checkbox" id="contract_new_undefinite" name="contract_new_undefinite" value=""/>Undefinite</label></div>		
 				<div class="checkbox-inline"><label><input type="checkbox" id="contract_new_do_not_renew" name="contract_new_do_not_renew" value=""/>Do not renew</label></div>
+				
 			</div>
 		
 		<button class="btn btn-sm btn-success" onclick="addContractToSupplier(${supplier_id});return false;" style="margin:5px 0px 0px 5px"><span class="glyphicon glyphicon-plus"></span></button>
