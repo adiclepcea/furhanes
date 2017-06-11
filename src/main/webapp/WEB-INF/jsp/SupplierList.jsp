@@ -27,7 +27,17 @@
 				id="supplier_header_${supplier.id}"  
 				onclick="populateSupplierEdit(${supplier.id})"
 				style="cursor:pointer; cursor:hand">
-				${supplier.name}
+				<c:choose>
+					<c:when test="${supplier.hasContractsToRenew()}">
+						<span class="alert-danger glyphicon glyphicon-time"></span>
+					</c:when>
+					<c:otherwise>
+						<c:if test="${supplier.hasContractsToRenewInDays(20)}">
+							<span class="alert-warning glyphicon glyphicon-time"></span>	
+						</c:if>
+					</c:otherwise>				
+				</c:choose>	
+				${supplier.name}			
 			</h4>
 			
 			<div class="list-group-item-text row">
@@ -41,8 +51,8 @@
 				</div>
 				<div class="col-md-4">
 					<button onclick="deleteSupplier(${supplier.id})" class="btn btn-sm btn-danger alignright">Del<span class="glyphicon glyphicon-trash"></span></button>
-					<button data-toggle="collapse" data-target="#supplier_contracts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContractList(${supplier.id})"><span class="glyphicon glyphicon-briefcase"></span> <span id="supplier_no_of_contracts_${supplier.id }" class="badge">${supplier.contracts.size() }</span></button>
-					<button data-toggle="collapse" data-target="#supplier_contacts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContactList(${supplier.id})"><span class="glyphicon glyphicon-user"></span> <span id="supplier_no_of_contacts_${supplier.id }" class="badge">${supplier.contacts.size() }</span></button>								
+					<button data-toggle="collapse" data-target="#supplier_contracts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContractListForSupplier(${supplier.id})"><span class="glyphicon glyphicon-briefcase"></span> <span id="supplier_no_of_contracts_${supplier.id }" class="badge">${supplier.contracts.size() }</span></button>
+					<button data-toggle="collapse" data-target="#supplier_contacts_${supplier.id}" class="btn btn-sm btn-info alignright" onclick="showContactListForSupplier(${supplier.id})"><span class="glyphicon glyphicon-user"></span> <span id="supplier_no_of_contacts_${supplier.id }" class="badge">${supplier.contacts.size() }</span></button>								
 				</div>
 				<div id="supplier_edit_${supplier.id }" class="collapse col-md-12">
 					

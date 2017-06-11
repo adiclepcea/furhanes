@@ -15,6 +15,7 @@
     <script src="<spring:url value='/resources/js/jquery-3.2.1.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/bootstrap.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/jquery-ui.min.js'/>" ></script>
+    <script src="<spring:url value='/resources/js/Chart.bundle.min.js'/>" ></script>
     
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
@@ -38,7 +39,14 @@
 	    <div class="collapse navbar-collapse" id="myNavbar">
 	      <ul class="nav navbar-nav">
 	      	<li class="active menu-item" id="mnuHome"><a href="#" onclick="goHome()">Home</a></li>
-	        <li class="menu-item" id="mnuSuppliers"><a href="#"onclick="showSuppliersList()">Suppliers</a></li>
+	        <li class="dropdown menu-item" id="mnuSuppliers">
+	        	<a href="#" class="drowpdown-toggle" data-toggle="dropdown" role="button" area-hashpopup="true" area-expanded="false">
+	        	Suppliers<span class="caret"></span></a>
+	        	<ul class="dropdown-menu">
+	        		<li><a href="#" onclick="showSuppliersList()">Supplier list</a></li>
+	        		<li><a href="#" onclick="showContractsList()">Contract list</a></li>
+	        	</ul>
+	        </li>
 	        <li class="menu-item" id="mnuPOs"><a href="#" onclick="notYetImplemented('mnuPOs')">POs</a></li>
 	        <li class="menu-item" id="mnuReceptions" onclick="notYetImplemented('mnuReceptions')"><a href="#">Receptions</a></li>
 	        <li class="menu-item" id="mnuStock" onclick="notYetImplemented('mnuStock')"><a href="#">Stock</a></li>
@@ -56,7 +64,17 @@
 	</nav>
 	
 	<div id="container" class="container-fluid">
-		<div  class="col-sm-6">
+		<div class="col-md-3 col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Contracts
+				</div>
+				<div class="panel-body">
+					<canvas id="contractsGraph"></canvas>					
+				</div>
+			</div>
+		</div>
+		<div  class="col-md-4 col-sm-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">Done</div>
 		  <div class="panel-body">
@@ -73,12 +91,13 @@
 		  		<li>Add, modify and delete suppliers</li>
 		  		<li>Add, modify and delete contacts</li>
 		  		<li>Add, modify and delete contracts</li>
+		  		<li>Show notifications for expiring/expired contracts</li>
 		  	</ul>
 		  </div>
 		</div>
 		</div>
 		
-		<div class="col-sm-6">
+		<div class="col-md-5 col-sm-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">TO DO</div>
 		  <div class="panel-body">
@@ -91,8 +110,7 @@
 		  				<li>Locations</li>
 		  				<li>etc.</li>
 		  			</ul>
-		  		</li>		  		
-		  		<li>Show notifications for expiring/expired contracts</li>
+		  		</li>		  				  		
 		  		<li>Add, modify and delete POs</li>
 		  		<li>Add, modify and delete receptions</li>
 		  		<li>Reports</li>
@@ -113,6 +131,10 @@
 		var startPositionSupplier = 0;
 		var countPositionsSupplier = 10;
 		
+		$(document).ready(function(){
+			setTimeout(drawContractsGraph(),1);
+		})
+		
 		function isInt(value) {
 			  return !isNaN(value) && 
 			         parseInt(Number(value)) == value && 
@@ -121,6 +143,59 @@
 		
 		function goHome(){
 			window.location.replace(".");
+		}
+		
+		function drawContractsGraph(){
+			$.ajax({
+				url:"./v1/contracts/statistics",
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){				
+					drawGraphContractsOnCanvas(data);
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}
+					
+					console.log(JSON.stringify(err));
+					
+				}
+			});			
+		}
+		
+		function drawGraphContractsOnCanvas(ajaxData){
+			var ctx = document.getElementById('contractsGraph').getContext('2d');
+			
+			ctx.canvas.width = 100;
+			ctx.canvas.height = 100;
+			var data = {
+				datasets: [{
+					data: [ajaxData.running,ajaxData.finished,ajaxData.expired,ajaxData.expiring],
+					backgroundColor:[
+						'#31B404',
+						'#A9D0F5',
+						'red',
+						'yellow'
+					]
+				}],
+				labels: [
+					'Valid',
+					'Finished',
+					'Expired',
+					'Expiring'
+				]
+				
+				
+			};
+			
+			var contractsPieChart = new  Chart(ctx,{
+				type: 'pie',
+				data: data,
+				options:{}
+			});
 		}
 		
 		function notYetImplemented(mnu){
@@ -359,7 +434,7 @@
 			}
 		}
 		
-		function showContactList(id,fnc,args){
+		function showContactListForSupplier(id,fnc,args){
 			$.ajax({
 				url:"suppliers/"+id+"/contacts",
 				type:"GET",
@@ -427,7 +502,7 @@
 					alert("Error:\r\n"+err);
 				},
 				success: function(data,textStatus,xhr){		
-					showContactList(id);
+					showContactListForSupplier(id);
 				} 
 			});
 		} 
@@ -455,13 +530,13 @@
 					alert(err);
 				},
 				success: function(data,textStatus,xhr){
-					showContactList(supplier_id);
+					showContactListForSupplier(supplier_id);
 				}
 			});
 		}
 		
 		function editContact(id,supplier_id){
-			showContactList(supplier_id,finishEditContact,[id, supplier_id]);
+			showContactListForSupplier(supplier_id,finishEditContact,[id, supplier_id]);
 		}
 		
 		function finishEditContact(arrIds){
@@ -516,7 +591,7 @@
 					alert("Error:\r\n"+err);
 				},
 				success: function(data){
-					showContactList(supplier_id);
+					showContactListForSupplier(supplier_id);
 				}
 			});
 		}
@@ -526,10 +601,10 @@
 			$("#del_contact_"+id).show();
 			$("#save_contact_"+id).hide();
 			$("#cancel_edit_contact_"+id).hide();
-			showContactList(supplier_id);
+			showContactListForSupplier(supplier_id);
 		}
 		
-		function showContractList(id,fnc,args){
+		function showContractListForSupplier(id,fnc,args){
 			
 			$.ajax({
 				url:"suppliers/"+id+"/contracts",
@@ -629,7 +704,7 @@
 				data:JSON.stringify(contract),
 				processData:false,
 				success:function(data){
-					showContractList(supplier_id);
+					showContractListForSupplier(supplier_id);
 				},
 				error: function(data){
 					alert(data.responseText);
@@ -649,7 +724,10 @@
 					type:"DELETE",
 					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 					success: function(data){
-						showContractList(supplier_id);
+						if(supplier_id){
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").hide();						
+						}
+						repaintContract(id,supplier_id);						
 					},
 					error: function(err){
 						if(err.hasOwnProperty("responseText")){
@@ -689,8 +767,10 @@
 					processData:false,
 					contentType:false,
 					success: function(data){						
-						$("#supplier_contracts_"+supplier_id+" #messageDiv").hide();
-						showContractList(supplier_id);
+						if(supplier_id){
+							$("#supplier_contracts_"+supplier_id+" #messageDiv").hide();						
+						}
+						repaintContract(id,supplier_id);
 					},
 					error:function(err){
 						if(err.hasOwnProperty("responseText")){
@@ -718,7 +798,11 @@
 					type:"DELETE",
 					headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 					success: function(data){
-						showContractList(supplier_id);
+						if(supplier_id){
+							showContractListForSupplier(supplier_id);
+						}else{
+							showContractsList();
+						}
 					},
 					error:function(err){
 						if(err.hasOwnProperty("responseText")){
@@ -732,7 +816,12 @@
 		}
 		
 		function editContract(id, supplier_id){
-			showContractList(supplier_id,finishEditContract,[id, supplier_id]);
+			//if we edit in the suppliers view, we refresh the view first, else we show the edit directly
+			if(supplier_id!=0){
+				showContractListForSupplier(supplier_id,finishEditContract,[id, supplier_id]);
+			}else{
+				finishEditContract([id,supplier_id]);
+			}
 		}
 		
 		function finishEditContract(arrIds){
@@ -764,10 +853,10 @@
 			
 			$("#contract_"+id+" .undefinite").html("<input type='checkbox' "+
 					($("#contract_"+id+" .undefinite").text()=="true"?"checked":"")+
-					" class='undefinite_update col-sm-12'/>");
+					" class='undefinite_update col-sm-5 checkbox-inline'/>");
 			$("#contract_"+id+" .do_not_renew").html("<input type='checkbox' "+
 					($("#contract_"+id+" .do_not_renew").text()=="true"?"checked":"")+
-					" class='do_not_renew_update col-sm-12'/>");
+					" class='do_not_renew_update col-sm-6 checkbox-inline'/>");
 
 			$("#contract_date_"+id).datepicker({ dateFormat: 'dd.mm.yy' });
 			if(date!=""){
@@ -783,21 +872,83 @@
 		}
 		
 		function cancelEditContract(id, supplier_id){
-			$("#edit_contract_"+id).show();
-			$("#del_contract_"+id).show();
-			$("#file_contract_"+id).show();
-			$("#del_file_contract_"+id).show();
-			$("#save_contract_"+id).hide();
-			$("#cancel_edit_contract_"+id).hide();
-			showContractList(supplier_id);
+			/*if(supplier_id){
+				showContractsListForSupplier(supplier_id);
+			}*/
+			repaintContract(id,supplier_id);
+		}
+		
+		function repaintContract(id,supplier_id){
+			$.ajax({
+				url:"v1/contracts/"+id,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contracts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}else{
+						alert(err);
+					}
+				},
+				success: function(data,textStatus,xhr){
+					var date = "";
+					//alert(JSON.stringify(data));
+					if(data.contractDate){
+						date = $.datepicker.formatDate("dd.mm.yy",new Date(data.contractDate));
+					}
+					$("#contract_"+id+" .date").text(date);
+					$("#contract_"+id+" .internal_number").text(data.internalNumber);
+					var expDate = "";
+					if(data.expirationDate){
+						expDate = $.datepicker.formatDate("dd.mm.yy",new Date(data.expirationDate));
+					}
+					$("#contract_"+id+" .expiration_date").text(expDate);
+					$("#contract_"+id+" .undefinite").text(data.undefinite);
+					$("#contract_"+id+" .object").text(data.contractObject);
+					$("#contract_"+id+" .payment_term").text(data.paymentTerm);
+					$("#contract_"+id+" .filed").text(data.filed);
+					$("#contract_"+id+" .do_not_renew").text(data.doNotRenew);
+					if(data.originalFileName){
+						$("#contract_"+id+" .scan").html("<button class=\"btn btn-sm btn-danger\" id=\"del_file_contract_"+id+"\" onclick=\"deleteContractFile("+id+","+supplier_id+")\">"+
+						"<span class=\"glyphicon glyphicon-trash\"></span></button> "+					
+						"<a download=\""+data.originalFileName+"\" href=\"contracts/"+id+"/download\" title=\""+data.originalFileName+"\">Download</a>");							
+					}else{
+						$("#contract_"+id+" .scan").html("");
+					}
+					
+					$("#edit_contract_"+id).show();
+					$("#del_contract_"+id).show();
+					$("#file_contract_"+id).show();
+					$("#del_file_contract_"+id).show();
+					$("#save_contract_"+id).hide();
+					$("#cancel_edit_contract_"+id).hide();
+					
+					if(data.mustRenew){
+						$("#contract_"+id).attr("class","alert-danger");
+					}else if(data.mustRenewInDays){
+						$("#contract_"+id).attr("class","alert-warning");
+					}else if(data.finished){
+						$("#contract_"+id).attr("class","alert-info");
+					}else{
+						$("#contract_"+id).attr("class","");
+					}
+				}
+			});
 		}
 		
 		function saveContract(id, supplier_id){
 			var rez=validateContract($("#contract_date_"+id), 
 					$("#contract_expiration_date_"+id),
-					$("#supplier_contracts_"+supplier_id+" .undefinite_update"),
-					$("#supplier_contracts_"+supplier_id+" .internal_number_update"),
-					$("#supplier_contracts_"+supplier_id+" .payment_term_update"));
+					$("#contract_"+id+" .undefinite_update"),
+					$("#contract_"+id+" .internal_number_update"),
+					$("#contract_"+id+" .payment_term_update"));
 			if(!rez){
 				return false;
 			}
@@ -809,11 +960,11 @@
 			contract.contractDate = rez.date;
 			contract.undefinite = rez.undefinite;
 			contract.internalNumber = rez.internalNumber;
-			contract.contractObject = $("#supplier_contracts_"+supplier_id+" .object_update").val();
+			contract.contractObject = $("#contract_"+id+" .object_update").val();
 			contract.paymentTerm = rez.paymentTerm;
 			contract.undefinite = rez.undefinite;
-			contract.filed = $("#supplier_contracts_"+supplier_id+" .filed_update").val();
-			contract.doNotRenew = $("#supplier_contracts_"+supplier_id+" .do_not_renew_update").is(':checked');
+			contract.filed = $("#contract_"+id+" .filed_update").val();
+			contract.doNotRenew = $("#contract_"+id+" .do_not_renew_update").is(':checked');
 			
 			$.ajax({
 				url: "v1/contracts/"+id,
@@ -823,13 +974,95 @@
 				data:JSON.stringify(contract),
 				processData:false,
 				success:function(data){
-					showContractList(supplier_id);
+					if(supplier_id){
+						showContractListForSupplier(supplier_id);	
+					}else{
+						repaintContract(id,supplier_id);
+					}
+					
 				},
 				error: function(data){
 					alert(data.responseText);
 					console.log(data);
 				}
 			});
+		}
+		
+		function showContractsList(filter){
+			var url = "contracts/list?startFrom=0&count=10";
+			if(filter){				
+				Object.keys(filter).forEach(function (key){
+					url+="&"+key+"="+filter[key];	
+				});
+			}
+			$.ajax({
+				url:url,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contracts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					$(".menu-item").removeClass("active");
+					$("#mnuSuppliers").addClass("active");
+					$("#container").html(data);						
+				}
+			});
+		}
+		
+		function filterContracts(){
+			var filter={};
+			filter.expired=$("#chkContractsExpired").is(':checked');
+			filter.expiring=$("#chkContractsExpiring").is(':checked');
+			filter.running=$("#chkContractsRunning").is(':checked');
+			filter.finished=$("#chkContractsFinished").is(':checked');
+			showContractsList(filter);
+		}
+		function downloadContractList(){
+			var filter={};
+			filter.expired=$("#chkContractsExpired").is(':checked');
+			filter.expiring=$("#chkContractsExpiring").is(':checked');
+			filter.running=$("#chkContractsRunning").is(':checked');
+			filter.finished=$("#chkContractsFinished").is(':checked');
+			var url = "contracts/downloadContractList?startFrom=0&count=0";
+					
+			Object.keys(filter).forEach(function (key){
+				url+="&"+key+"="+filter[key];	
+			});
+			window.location.href=url;
+			/*$.ajax({
+				url:url,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contracts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					$(".menu-item").removeClass("active");
+					$("#mnuSuppliers").addClass("active");
+					$("#container").html(data);						
+				}
+			});*/	
 		}
 		
 	</script>

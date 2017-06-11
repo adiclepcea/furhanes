@@ -1,6 +1,8 @@
 package org.clepcea.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +29,17 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 	@Autowired
 	private FileUploadService fileUploadService;
 	
+	@RequestMapping(value="/{id}", method=RequestMethod.GET)
+	@ResponseBody
+	public Object getContract(@PathVariable long id, HttpServletResponse response){
+		logger.info("getContract Called");		
+		Contract c = contractService.getContractById(id);
+		c.setMustRenew(c.mustRenew());
+		c.setMustRenewInDays(c.mustRenewInDays(20));
+		c.setFinished(c.isFinished());
+		return c;
+	}
+	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public Object deleteContract(@PathVariable long id, HttpServletResponse response){
 		logger.info("deleteContract Called");
@@ -42,10 +55,20 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		logger.info("saveContact Called");		
 		Contract c = contractService.getContractById(contract.getId());
 		contract.setSupplier(c.getSupplier());
+		contract.setOriginalFileName(c.getOriginalFileName());
+		contract.setScanFile(c.getScanFile());
 		contractService.saveContract(contract);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;
 	}
+	
+	@RequestMapping(value="/statistics", method=RequestMethod.GET,produces="application/json")
+	@ResponseBody
+	public Map<String,Long> getStatistics(){
+		
+		return contractService.getStatistics();
+	}
+	
 	
 	@RequestMapping(value="/{id}/file",method=RequestMethod.DELETE)
 	public Object  deleteScan(@PathVariable long id,HttpServletResponse response){
