@@ -75,7 +75,7 @@ public class ContractController {
 	}
 	
 	@RequestMapping(value="{id}/download", method=RequestMethod.GET)
-	public void getScantFile(@PathVariable long id, HttpServletResponse response){
+	public void getScanFile(@PathVariable long id, HttpServletResponse response){
 		Contract c = contractService.getContractById(id);
 		String fileName = c.getScanFile(); 
 		if(fileName!=null){
@@ -97,41 +97,66 @@ public class ContractController {
 		}
 	}
 	
+	@RequestMapping(value="downloadContractList",method=RequestMethod.GET)
+	public void generateExcelFromList(HttpServletResponse response,
+			@RequestParam Map<String, Object> filter){
+		int startFrom=getIntFromQuery(filter, "startFrom");
+		int count=getIntFromQuery(filter, "count");
+		
+		Map<String,Object> passFilter=getFilterMapFromQuery(filter);
+		
+		response.addHeader("content-disposition", "attachment; filename=\"" + "contractsList.xls" +"\"");
+		
+		try{			
+			contractService.writeListToExcel(startFrom, count, passFilter, response.getOutputStream());			
+		}catch(IOException ioex){
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	
 	private boolean isInteger(String str){
 		return str.matches("^[0-9]{1,10}$");
 	}
 	
-	@RequestMapping(value="list", method=RequestMethod.GET)
-	public String getContractList(ModelMap model,
-			//@RequestParam(value="startFrom",  required=false) Integer startFrom,
-			//@RequestParam(value="count",  required=false) Integer count,
-			//@RequestParam(value="order", required=false) String order,
-			@RequestParam Map<String, Object> filter){
-		
-		int startFrom=0;
-		int count=0;
-		model.addAttribute("supplier_id",0);
-		//if(startFrom==null){
-		//	startFrom=0;
-		//}
-		//if(count==null){
-		//	count=0;
-		//}
+	private int getIntFromQuery(Map<String,Object> filter,String search){
+		int rez = 0; 
+		if(filter.containsKey(search) && isInteger(filter.get(search).toString())){
+			rez = Integer.parseInt(filter.get("startFrom").toString());
+		}		
+		return rez;
+	}
+	
+	private Map<String,Object> getFilterMapFromQuery(Map<String,Object> filter){
 		Map<String,Object> passFilter=null;
 		if(filter!=null){
 			logger.info(filter);			
-			if(filter.containsKey("startFrom") && isInteger(filter.get("startFrom").toString())){
-				startFrom = Integer.parseInt(filter.get("startFrom").toString());
-			}
-			if(filter.containsKey("count") && isInteger(filter.get("count").toString())){
-				count = Integer.parseInt(filter.get("count").toString());
-			}
-			passFilter = filter.entrySet().stream().filter(it->it.getKey().equals("expired") || it.getKey().equals("expiring")).collect(Collectors.toMap(it->it.getKey(),it->it.getValue()));
+			
+			passFilter = filter
+					.entrySet()
+					.stream()
+					.filter(it->it.getKey().equals("expired") || it.getKey().equals("expiring") || it.getKey().equals("running") || it.getKey().equals("finished"))
+					.collect(Collectors.toMap(it->it.getKey(),it->it.getValue()));
 			
 		}
+		return passFilter;
+	}
+	
+	@RequestMapping(value="list", method=RequestMethod.GET)
+	public String getContractList(ModelMap model,
+			@RequestParam Map<String, Object> filter){
+		
+		int startFrom=getIntFromQuery(filter, "startFrom");
+		int count=getIntFromQuery(filter, "count");
+		
+		Map<String,Object> passFilter=getFilterMapFromQuery(filter);
+		
+		model.addAttribute("supplier_id",0);
 		model.addAttribute("contracts", contractService.listContracts(startFrom, count, passFilter));
 		model.addAttribute("expired", passFilter!=null && passFilter.containsKey("expired") && passFilter.get("expired").equals("true"));
 		model.addAttribute("expiring", passFilter!=null && passFilter.containsKey("expiring") && passFilter.get("expiring").equals("true"));
+		model.addAttribute("running", passFilter!=null && passFilter.containsKey("running") && passFilter.get("running").equals("true"));
+		model.addAttribute("finished", passFilter!=null && passFilter.containsKey("finished") && passFilter.get("finished").equals("true"));
 		return "ContractList";
 	}
 	

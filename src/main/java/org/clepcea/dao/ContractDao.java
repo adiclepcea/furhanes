@@ -10,4 +10,8 @@ public interface ContractDao {
 	public List<Contract> list(int start,int count,Map<String, Object> filter);
 	public void deleteById(long id);
 	public Contract getById(long id);
+	public Long getExpiredContractsCount();
+	public Long getExpiringContractsCount();
+	public Long getRunningContractsCount();
+	public Long getFinishedContractsCount();
 }

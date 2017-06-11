@@ -37,11 +37,15 @@ public class Contract implements Serializable{
 	}
 	
 	public boolean isExpired(){
-		return getExpirationDate().before((new Date()));
+		return !isUndefinite() && getExpirationDate().before((new Date()));
 	}
 	
 	public boolean isAboutToExpireInDays(int days){
 		return getExpirationDate().getTime()-(1000*3600*24*days)<=(new Date()).getTime();
+	}
+	
+	public boolean isFinished(){
+		return isExpired() && !isUndefinite() && isDoNotRenew() ;
 	}
 	
 	public boolean mustRenew(){
@@ -57,6 +61,13 @@ public class Contract implements Serializable{
 	public boolean isMustRenew() {
 		return mustRenew;
 	}
+	
+	@Transient
+	private boolean finished;
+	public void setFinished(boolean f){
+		this.finished = f;
+	}
+	
 	public void setMustRenew(boolean mustRenew) {
 		this.mustRenew = mustRenew;
 	}

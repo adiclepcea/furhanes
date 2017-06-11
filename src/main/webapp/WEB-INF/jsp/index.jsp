@@ -15,6 +15,7 @@
     <script src="<spring:url value='/resources/js/jquery-3.2.1.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/bootstrap.min.js'/>" ></script>
     <script src="<spring:url value='/resources/js/jquery-ui.min.js'/>" ></script>
+    <script src="<spring:url value='/resources/js/Chart.bundle.min.js'/>" ></script>
     
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
@@ -63,7 +64,17 @@
 	</nav>
 	
 	<div id="container" class="container-fluid">
-		<div  class="col-sm-6">
+		<div class="col-md-3 col-sm-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Contracts
+				</div>
+				<div class="panel-body">
+					<canvas id="contractsGraph"></canvas>					
+				</div>
+			</div>
+		</div>
+		<div  class="col-md-4 col-sm-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">Done</div>
 		  <div class="panel-body">
@@ -80,12 +91,13 @@
 		  		<li>Add, modify and delete suppliers</li>
 		  		<li>Add, modify and delete contacts</li>
 		  		<li>Add, modify and delete contracts</li>
+		  		<li>Show notifications for expiring/expired contracts</li>
 		  	</ul>
 		  </div>
 		</div>
 		</div>
 		
-		<div class="col-sm-6">
+		<div class="col-md-5 col-sm-6">
 		<div class="panel panel-default">
 		  <div class="panel-heading">TO DO</div>
 		  <div class="panel-body">
@@ -98,8 +110,7 @@
 		  				<li>Locations</li>
 		  				<li>etc.</li>
 		  			</ul>
-		  		</li>		  		
-		  		<li>Show notifications for expiring/expired contracts</li>
+		  		</li>		  				  		
 		  		<li>Add, modify and delete POs</li>
 		  		<li>Add, modify and delete receptions</li>
 		  		<li>Reports</li>
@@ -120,6 +131,10 @@
 		var startPositionSupplier = 0;
 		var countPositionsSupplier = 10;
 		
+		$(document).ready(function(){
+			setTimeout(drawContractsGraph(),1);
+		})
+		
 		function isInt(value) {
 			  return !isNaN(value) && 
 			         parseInt(Number(value)) == value && 
@@ -128,6 +143,59 @@
 		
 		function goHome(){
 			window.location.replace(".");
+		}
+		
+		function drawContractsGraph(){
+			$.ajax({
+				url:"./v1/contracts/statistics",
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){				
+					drawGraphContractsOnCanvas(data);
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}
+					
+					console.log(JSON.stringify(err));
+					
+				}
+			});			
+		}
+		
+		function drawGraphContractsOnCanvas(ajaxData){
+			var ctx = document.getElementById('contractsGraph').getContext('2d');
+			
+			ctx.canvas.width = 100;
+			ctx.canvas.height = 100;
+			var data = {
+				datasets: [{
+					data: [ajaxData.running,ajaxData.finished,ajaxData.expired,ajaxData.expiring],
+					backgroundColor:[
+						'#31B404',
+						'#A9D0F5',
+						'red',
+						'yellow'
+					]
+				}],
+				labels: [
+					'Valid',
+					'Finished',
+					'Expired',
+					'Expiring'
+				]
+				
+				
+			};
+			
+			var contractsPieChart = new  Chart(ctx,{
+				type: 'pie',
+				data: data,
+				options:{}
+			});
 		}
 		
 		function notYetImplemented(mnu){
@@ -831,6 +899,7 @@
 				},
 				success: function(data,textStatus,xhr){
 					var date = "";
+					//alert(JSON.stringify(data));
 					if(data.contractDate){
 						date = $.datepicker.formatDate("dd.mm.yy",new Date(data.contractDate));
 					}
@@ -865,6 +934,8 @@
 						$("#contract_"+id).attr("class","alert-danger");
 					}else if(data.mustRenewInDays){
 						$("#contract_"+id).attr("class","alert-warning");
+					}else if(data.finished){
+						$("#contract_"+id).attr("class","alert-info");
 					}else{
 						$("#contract_"+id).attr("class","");
 					}
@@ -893,7 +964,7 @@
 			contract.paymentTerm = rez.paymentTerm;
 			contract.undefinite = rez.undefinite;
 			contract.filed = $("#contract_"+id+" .filed_update").val();
-			contract.doNotRenew = $("#contract_"+supplier_id+" .do_not_renew_update").is(':checked');
+			contract.doNotRenew = $("#contract_"+id+" .do_not_renew_update").is(':checked');
 			
 			$.ajax({
 				url: "v1/contracts/"+id,
@@ -919,8 +990,10 @@
 		
 		function showContractsList(filter){
 			var url = "contracts/list?startFrom=0&count=10";
-			if(filter){
-				url+="&expired="+filter.expired+"&expiring="+filter.expiring;
+			if(filter){				
+				Object.keys(filter).forEach(function (key){
+					url+="&"+key+"="+filter[key];	
+				});
 			}
 			$.ajax({
 				url:url,
@@ -951,7 +1024,45 @@
 			var filter={};
 			filter.expired=$("#chkContractsExpired").is(':checked');
 			filter.expiring=$("#chkContractsExpiring").is(':checked');
+			filter.running=$("#chkContractsRunning").is(':checked');
+			filter.finished=$("#chkContractsFinished").is(':checked');
 			showContractsList(filter);
+		}
+		function downloadContractList(){
+			var filter={};
+			filter.expired=$("#chkContractsExpired").is(':checked');
+			filter.expiring=$("#chkContractsExpiring").is(':checked');
+			filter.running=$("#chkContractsRunning").is(':checked');
+			filter.finished=$("#chkContractsFinished").is(':checked');
+			var url = "contracts/downloadContractList?startFrom=0&count=0";
+					
+			Object.keys(filter).forEach(function (key){
+				url+="&"+key+"="+filter[key];	
+			});
+			window.location.href=url;
+			/*$.ajax({
+				url:url,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				error:function(err){
+					if(err.hasOwnProperty("status") ){
+						if(err.status==401){
+							alert("Please relogin!")
+							return;
+						}else if(err.status==403){
+							alert("You are not authorized to view contracts!");
+							return;
+						}
+						alert(JSON.stringify(err));
+					}
+					alert(err);
+				},
+				success: function(data,textStatus,xhr){
+					$(".menu-item").removeClass("active");
+					$("#mnuSuppliers").addClass("active");
+					$("#container").html(data);						
+				}
+			});*/	
 		}
 		
 	</script>

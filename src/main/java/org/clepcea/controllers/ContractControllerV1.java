@@ -1,6 +1,8 @@
 package org.clepcea.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +36,7 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		Contract c = contractService.getContractById(id);
 		c.setMustRenew(c.mustRenew());
 		c.setMustRenewInDays(c.mustRenewInDays(20));
+		c.setFinished(c.isFinished());
 		return c;
 	}
 	
@@ -56,6 +59,14 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;
 	}
+	
+	@RequestMapping(value="/statistics", method=RequestMethod.GET,produces="application/json")
+	@ResponseBody
+	public Map<String,Long> getStatistics(){
+		
+		return contractService.getStatistics();
+	}
+	
 	
 	@RequestMapping(value="/{id}/file",method=RequestMethod.DELETE)
 	public Object  deleteScan(@PathVariable long id,HttpServletResponse response){
