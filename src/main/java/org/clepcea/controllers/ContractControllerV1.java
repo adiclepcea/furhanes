@@ -55,6 +55,8 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		logger.info("saveContact Called");		
 		Contract c = contractService.getContractById(contract.getId());
 		contract.setSupplier(c.getSupplier());
+		contract.setOriginalFileName(c.getOriginalFileName());
+		contract.setScanFile(c.getScanFile());
 		contractService.saveContract(contract);
 		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		return null;

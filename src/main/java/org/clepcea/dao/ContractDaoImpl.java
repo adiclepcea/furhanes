@@ -25,8 +25,6 @@ public class ContractDaoImpl implements ContractDao {
 		Transaction tx = session.beginTransaction();
 		Contract c=this.getById(contract.getId());
 		contract.setSupplier(c.getSupplier());
-		contract.setOriginalFileName(c.getOriginalFileName());
-		contract.setScanFile(c.getScanFile());
 		session.saveOrUpdate(contract);
 		tx.commit();
 		session.close();
