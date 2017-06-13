@@ -5,8 +5,8 @@
 
 	<div>
 		<div id="supplierHeader"><button id="btnAddSupplier" class="btn btn-md btn-success" onclick="addSupplier()">Add supplier</button>
-			<input type="text" id="supplier_filter"/>
-			<button id="btnFilter" class="btn btn-md btn-info" onclick="filterSuppliers()"><span class="glyphicon glyphicon-search"></span></button>filter="${filter}"
+			<input type="text" id="supplier_filter" value="${filter }"/>
+			<button id="btnFilter" class="btn btn-md btn-info" onclick="filterSuppliers()"><span class="glyphicon glyphicon-search"></span></button>
 		</div>
 		<button id="btnCancelAddSupplier" class="btn btn-md btn-warning" onclick="closeAddSupplier()" style="display:none">Close add supplier</button>		
 		<div>
@@ -71,7 +71,10 @@
 	<div class="">
 		<ul class="pager">
 			<li><a href="#" onclick="decrementSupplierPos()">Previous</a></li>
-			<li><a href="#" onclick="incrementSupplierPos()">Next</a></li>
+			<c:if test="${request_count>0 && suppliers.size()==request_count}">
+				<li><a href="#" onclick="incrementSupplierPos()">Next</a></li>
+			</c:if>
+			
 		</ul>
 	</div>
 	

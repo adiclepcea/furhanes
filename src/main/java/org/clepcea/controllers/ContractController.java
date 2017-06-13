@@ -122,7 +122,7 @@ public class ContractController {
 	private int getIntFromQuery(Map<String,Object> filter,String search){
 		int rez = 0; 
 		if(filter.containsKey(search) && isInteger(filter.get(search).toString())){
-			rez = Integer.parseInt(filter.get("startFrom").toString());
+			rez = Integer.parseInt(filter.get(search).toString());
 		}		
 		return rez;
 	}
@@ -152,6 +152,7 @@ public class ContractController {
 		Map<String,Object> passFilter=getFilterMapFromQuery(filter);
 		
 		model.addAttribute("supplier_id",0);
+		model.addAttribute("request_count",count);
 		model.addAttribute("contracts", contractService.listContracts(startFrom, count, passFilter));
 		model.addAttribute("expired", passFilter!=null && passFilter.containsKey("expired") && passFilter.get("expired").equals("true"));
 		model.addAttribute("expiring", passFilter!=null && passFilter.containsKey("expiring") && passFilter.get("expiring").equals("true"));

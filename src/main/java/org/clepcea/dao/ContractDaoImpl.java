@@ -119,6 +119,9 @@ public class ContractDaoImpl implements ContractDao {
 		
 		hql+=" order by supplier.name, contractDate";
 		Query qry = session.createQuery(hql);
+		
+		System.out.println(String.format("Count=%d, Start=%d",count, start));
+		
 		if(count>0){
 			qry.setFirstResult(start);
 			qry.setMaxResults(count);

@@ -43,8 +43,8 @@
 	        	<a href="#" class="drowpdown-toggle" data-toggle="dropdown" role="button" area-hashpopup="true" area-expanded="false">
 	        	Suppliers<span class="caret"></span></a>
 	        	<ul class="dropdown-menu">
-	        		<li><a href="#" onclick="showSuppliersList()">Supplier list</a></li>
-	        		<li><a href="#" onclick="showContractsList()">Contract list</a></li>
+	        		<li><a href="#" onclick="startPositionSupplier=0;showSuppliersList()">Supplier list</a></li>
+	        		<li><a href="#" onclick="startPositionContract=0;showContractsList()">Contract list</a></li>
 	        	</ul>
 	        </li>
 	        <li class="menu-item" id="mnuPOs"><a href="#" onclick="notYetImplemented('mnuPOs')">POs</a></li>
@@ -130,6 +130,8 @@
 	<script type="text/javascript">
 		var startPositionSupplier = 0;
 		var countPositionsSupplier = 10;
+		var startPositionContract = 0;
+		var countPositionsContract = 10;
 		
 		$(document).ready(function(){
 			setTimeout(drawContractsGraph(),1);
@@ -227,16 +229,19 @@
 		
 		function incrementSupplierPos(){
 			startPositionSupplier+=countPositionsSupplier;
-			showSuppliersList();
+			filterSuppliers(true);
 		}
 		
 		function decrementSupplierPos(){			
 			startPositionSupplier-=countPositionsSupplier;
 			startPositionSupplier = Math.max(0,startPositionSupplier);
-			showSuppliersList();
+			filterSuppliers(true);
 		}
 		
-		function filterSuppliers(){
+		function filterSuppliers(keepIndex){
+			if(!keepIndex){
+				startPositionSupplier = 0;
+			}
 			showSuppliersList($("#supplier_filter").val());
 		}
 		
@@ -989,7 +994,7 @@
 		}
 		
 		function showContractsList(filter){
-			var url = "contracts/list?startFrom=0&count=10";
+			var url = "contracts/list?startFrom="+startPositionContract+"&count="+countPositionsSupplier;
 			if(filter){				
 				Object.keys(filter).forEach(function (key){
 					url+="&"+key+"="+filter[key];	
@@ -1020,12 +1025,15 @@
 			});
 		}
 		
-		function filterContracts(){
+		function filterContracts(keepIndex){
 			var filter={};
 			filter.expired=$("#chkContractsExpired").is(':checked');
 			filter.expiring=$("#chkContractsExpiring").is(':checked');
 			filter.running=$("#chkContractsRunning").is(':checked');
 			filter.finished=$("#chkContractsFinished").is(':checked');
+			if(!keepIndex){
+				startPositionContract = 0;
+			}
 			showContractsList(filter);
 		}
 		function downloadContractList(){
@@ -1040,29 +1048,17 @@
 				url+="&"+key+"="+filter[key];	
 			});
 			window.location.href=url;
-			/*$.ajax({
-				url:url,
-				type:"GET",
-				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
-				error:function(err){
-					if(err.hasOwnProperty("status") ){
-						if(err.status==401){
-							alert("Please relogin!")
-							return;
-						}else if(err.status==403){
-							alert("You are not authorized to view contracts!");
-							return;
-						}
-						alert(JSON.stringify(err));
-					}
-					alert(err);
-				},
-				success: function(data,textStatus,xhr){
-					$(".menu-item").removeClass("active");
-					$("#mnuSuppliers").addClass("active");
-					$("#container").html(data);						
-				}
-			});*/	
+		}
+		
+		function incrementContractPos(){
+			startPositionContract+=countPositionsContract;
+			filterContracts(true);	
+		}
+		
+		function decrementContractPos(){
+			startPositionContract-=countPositionsContract;
+			startPositionContract = Math.max(0,startPositionContract);
+			filterContracts(true);	
 		}
 		
 	</script>

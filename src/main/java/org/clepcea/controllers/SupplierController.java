@@ -56,6 +56,7 @@ public class SupplierController {
 			count = 0;
 		}
 		
+		model.addAttribute("request_count",count);
 		if(name!=null){
 			HashMap<String, Object> filter = new HashMap<>();
 			filter.put("name", name);
@@ -63,7 +64,7 @@ public class SupplierController {
 			model.addAttribute("filter",name);
 		}else{
 			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null));
-			model.addAttribute("filter","no filter");
+			model.addAttribute("filter","");
 		}
 		
 		return "SupplierList";

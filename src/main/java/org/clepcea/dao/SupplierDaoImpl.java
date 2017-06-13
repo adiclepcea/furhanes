@@ -49,13 +49,18 @@ public class SupplierDaoImpl implements SupplierDao {
 	public List<Supplier> list(int start, int count,HashMap<String, Object> filter) {
 		Session session = sessionFactory.openSession();
 		
+		System.out.println(String.format("Count=%d, Start=%d",count, start));
+		
 		Criteria crit = session.createCriteria(Supplier.class);
+		
 		if(filter!=null){
 			crit.add(Restrictions.ilike("name", "%"+filter.get("name").toString()+"%"));
+		}
+		crit.addOrder(Order.asc("name"));
+		if(count>0){
 			crit.setMaxResults(count);
 			crit.setFirstResult(start);
 		}
-		crit.addOrder(Order.asc("name"));
 		List<Supplier> lst = crit.list();
 		
 		for(Supplier s : lst){

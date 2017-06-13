@@ -102,3 +102,14 @@
 	
 </div>
 </fieldset>
+
+<c:if test="${supplier_id==0}">
+	<div class="">
+		<ul class="pager">
+			<li><a href="#" onclick="decrementContractPos()">Previous</a></li>
+			<c:if test="${request_count>0 && contracts.size()==request_count }">
+				<li><a href="#" onclick="incrementContractPos()">Next</a></li>
+			</c:if>
+		</ul>
+	</div>
+</c:if>
