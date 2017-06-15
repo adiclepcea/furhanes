@@ -230,7 +230,24 @@
 		
 		
 		function showUsers(){
-			
+			$.ajax({
+				url:"users/list",
+				type: "GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){
+					$("#container").html(data);
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}
+					
+					console.log(JSON.stringify(err));
+				}
+				
+			});
 		}
 		
 		

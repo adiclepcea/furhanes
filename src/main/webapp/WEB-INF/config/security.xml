@@ -73,6 +73,8 @@
     			<beans:value>org.clepcea.model.Supplier</beans:value>
     			<beans:value>org.clepcea.model.Contact</beans:value>
     			<beans:value>org.clepcea.model.Contract</beans:value>
+    			<beans:value>org.clepcea.model.User</beans:value>
+    			<beans:value>org.clepcea.model.Role</beans:value>
     		</beans:list>
     	</beans:property>
     	<beans:property name="hibernateProperties">
