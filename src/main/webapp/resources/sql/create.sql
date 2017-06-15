@@ -108,6 +108,13 @@ insert into RIGHTS(NAME) values('ROLE_RIGHT_SUPPLIERS');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_RECEPTIONS');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_STOCK');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_USERS');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_CONTRACTS');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_CONTRACTS_W');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_SUPPLIERS_W');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_PO_W');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_STOCK_W');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_USERS_W');
+
 
 --users2roles
 CREATE TABLE users2roles
@@ -182,6 +189,12 @@ insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,3);
 insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,4);
 insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,5);
 insert into ROLES2RIGHTS (ROLES_ID,RIGHTS_ID) values(1,6);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,7);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,8);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,9);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,10);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,11);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,12);
 
 --suppliers
 
