@@ -53,7 +53,7 @@
 	        <li class="menu-item" id="mnuStock" onclick="notYetImplemented('mnuStock')"><a href="#">Stock</a></li>
 	      </ul>
 	      <ul class="nav navbar-nav navbar-right">
-	        <li><a href="#" onclick="showUsers()"><span class="glyphicon glyphicon-user"></span> Users </a></li>
+	        <li class="menu-item" id="mnuUsers"><a href="#" onclick="showUsers()"><span class="glyphicon glyphicon-user"></span> Users </a></li>
 	        <%  if(request.getRemoteUser()==null) {%>
 	        	<li><a href="${loginUrl}" ><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 	        <%}else{ %>
@@ -236,17 +236,209 @@
 				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
 				success: function(data){
 					$("#container").html(data);
+					$(".menu-item").removeClass("active");
+					$("#mnuUsers").addClass("active");
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
 						alert("Please relogin!");
 						window.location.replace(".");
 						return;
+					}else{
+						alert(err);
 					}
 					
 					console.log(JSON.stringify(err));
 				}
 				
+			});
+		}
+		
+		function populateUserEdit(id){
+			$.ajax({
+				url:"v1/users/"+id,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){
+					//roles
+					var roles = data.roles;
+					$("#chkrole_"+id).attr("checked",false);
+					roles.forEach(function(role){
+						$("#"+role.id+"_"+id).attr("checked",true);
+					});
+					//details
+					$("#update_user_name_"+id).val(data.username);
+					$("#update_user_firstname_"+id).val(data.firstName);
+					$("#update_user_lastname_"+id).val(data.lastName);
+					$("#update_user_email_"+id).val(data.email);
+					
+					console.log(JSON.stringify(data));
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});
+		}
+		
+		function addUser(){
+			var rez = validateNewUser();
+			if(!rez){
+				return;
+			}
+			
+			console.log(JSON.stringify(rez));
+			
+			$.ajax({
+				url:"v1/users",
+				type: "POST",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				data: JSON.stringify(rez),
+				success: function(data){
+					//alert(JSON.stringify(data));
+					showUsers();
+				},
+				error:  function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});
+			
+		}
+		
+		function validateNewUser(){
+			var user = {};
+			if($("#add_user_name").val()==""){
+				alert("Please fill in the username");
+				$("#add_user_name").focus();
+				return false;
+			}
+			if($("#add_user_pass").val()==""){
+				alert("Please choose a password!");
+				$("#add_user_pass").focus();
+				return false;
+			}
+			if($("#add_user_pass").val()!=$("#add_user_pass_confirm").val()){
+				alert("The passwords you choose do not match!");
+				$("#add_user_pass").focus();
+				return false;
+			}
+			user.username = $("#add_user_name").val();
+			if($("#add_user_pass_confirm_"+id).val() == $("#add_user_pass").val()){
+				user.pass = $("#add_user_pass").val();
+			}else{
+				user.pass = null;
+			}
+			user.firstName = $("#add_user_firstname").val();
+			user.lastName = $("#add_user_lastname").val();
+			user.email = $("#add_user_email").val();
+			user.roles = [];
+			user.enabled = true;
+			
+			return user;
+		}
+		
+		function validateUser(id){
+			var user = {};
+			if($("#update_user_name_"+id).val()==""){
+				alert("Please fill in the username");
+				$("#update_user_name_"+id).focus();
+				return false;
+			}
+			if($("#update_user_pass_"+id).val()!=$("#update_user_pass_confirm_"+id).val()){
+				alert("The passwords you choose do not match!");
+				$("#update_user_pass_"+id).focus();
+				return false;
+			}
+			user.id = id;
+			user.username = $("#update_user_name_"+id).val();
+			if($("#update_user_pass_confirm_"+id).val() == $("#update_user_pass_"+id).val()){
+				user.pass = $("#update_user_pass_"+id).val();
+			}else{
+				user.pass = null;
+			}
+			user.firstName = $("#update_user_firstname_"+id).val();
+			user.lastName = $("#update_user_lastname_"+id).val();
+			user.email = $("#update_user_email_"+id).val();
+			user.roles = [];
+			user.enabled = true;
+			 
+			$(".chkrole_"+id).each(function(index,elem){
+				if(elem.checked){
+					var role = {};
+					role.id = parseInt(elem.id.substr(0,elem.id.indexOf("_")));
+					role.name = elem.parentElement.textContent.trim();
+					user.roles.push(role);
+				}
+			});
+			
+			return user;
+		}
+		
+		function saveUser(id){
+			var rez = validateUser(id); 
+			if(!rez){
+				return;
+			}
+			
+			console.log(JSON.stringify(rez));
+			
+			$.ajax({
+				url:"v1/users/"+id,
+				type: "PUT",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				data: JSON.stringify(rez),
+				success: function(data){
+					//alert(JSON.stringify(data));
+					showUsers();
+				},
+				error:  function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});
+		}
+		
+		function deleteUser(id){
+			if(!confirm("Are you sure you want to delete this user?")){
+				return;
+			}
+			$.ajax({
+				url:"v1/users/"+id,
+				type:"DELETE",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){
+					//alert("Deleted");
+					showUsers();
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));					
+				}
 			});
 		}
 		

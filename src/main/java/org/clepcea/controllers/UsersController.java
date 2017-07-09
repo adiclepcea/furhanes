@@ -1,9 +1,10 @@
 package org.clepcea.controllers;
 
-import java.util.Arrays;
 import java.util.List;
 
+import org.clepcea.model.Role;
 import org.clepcea.model.User;
+import org.clepcea.services.RoleService;
 import org.clepcea.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +19,20 @@ public class UsersController {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private RoleService roleService;
+	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String getUsersList(ModelMap model){
 		
 		List<User> lstUsers = userService.listUsers(); 
+		List<Role> lstRoles = roleService.listRoles();
 		
 		model.addAttribute("users",lstUsers);
+		model.addAttribute("roles",lstRoles);
 		
 		return "UsersList";
 	}
+
+	
 }

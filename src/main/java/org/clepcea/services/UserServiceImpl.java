@@ -6,6 +6,7 @@ import org.clepcea.dao.UserDao;
 import org.clepcea.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -14,8 +15,8 @@ public class UserServiceImpl implements UserService {
 	private UserDao userDao;
 	
 	@Override
-	public void saveUser(User user) {
-		userDao.save(user);
+	public User saveUser(User user) {
+		return userDao.save(user);
 	}
 
 	@Override
@@ -24,8 +25,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteUserById(long id) {
-		userDao.deleteById(id);
+		User u = userDao.getById(id);
+		if(u!=null){
+			u.setEnabled(false);
+		}
+		userDao.save(u);
 
 	}
 

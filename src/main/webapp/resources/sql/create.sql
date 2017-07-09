@@ -4,12 +4,20 @@ CREATE TABLE users
     id integer not null,
     username varchar(20),
     pass varchar(256),
-    name varchar(250),
-    mail varchar(100),
-    enables smallint,
+    first_name varchar(100),
+    last_name varchar(200),
+    email varchar(2050),
+    enabled smallint,
     CONSTRAINT PK_USERS
         PRIMARY KEY (id)
 );
+
+--ALTER TABLE USERS ADD 
+--first_name Varchar(100);
+--ALTER TABLE USERS ADD 
+--last_name Varchar(200);
+--ALTER TABLE USERS ADD 
+--email Varchar(250);
 
 CREATE GENERATOR GEN_USERS_ID;
 

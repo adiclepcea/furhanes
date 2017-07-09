@@ -2,6 +2,7 @@ package org.clepcea.dao;
 
 import java.util.List;
 
+import org.clepcea.model.Role;
 import org.clepcea.model.User;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -9,48 +10,34 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class UserDaoImpl implements UserDao {
+public class RoleDaoImpl implements RoleDao {
 
 	@Autowired
 	private SessionFactory sessionFactory;
 	
 	@Override
-	@Transactional
-	public User save(User user) {
+	public void save(Role role) {
 		Session session = this.sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
-		if(user.getPass()==null || user.getPass().equals("")){
-			User u = getById(user.getId());
-			if(u!=null){
-				user.setPass(u.getPass());
-			}
-		}
-		session.saveOrUpdate(user);
+		session.saveOrUpdate(role);
 		tx.commit();
 		session.close();
-		return getById(user.getId());
 	}
 
 	@Override
-	public List<User> list() {
+	public List<Role> list() {
 		Session session = sessionFactory.openSession();
 		
-		Criteria crit = session.createCriteria(User.class);
+		Criteria crit = session.createCriteria(Role.class);
 		
-		crit.add(Restrictions.eq("enabled", true));
-		crit.addOrder(Order.asc("username"));
+		crit.addOrder(Order.asc("name"));
 		
-		List<User> lst = crit.list();
+		List<Role> lst = crit.list();
 		
-		for(User u : lst){
-			u.getRoles().size();
-		}
 		session.close();		
 		return lst;
 	}
@@ -58,26 +45,25 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	public void deleteById(long id) {
 		Session session = sessionFactory.openSession();
-		User user = new User();
-		user.setId(id);
+		Role role = new Role();
+		role.setId(id);
 	
-		session.delete(user);
+		session.delete(role);
 		session.flush();
 		
 		session.close();
+
 	}
 
 	@Override
-	public User getById(long id) {
+	public Role getById(long id) {
 		Session session = sessionFactory.openSession();
-		Query query = session.createQuery("from User where id=:id");
+		Query query = session.createQuery("from Role where id=:id");
 		query.setParameter("id", id);	
-		User user = (User)query.uniqueResult(); 
-		if(user!=null){
-			user.getRoles().size();
-		}
+		Role role = (Role)query.uniqueResult(); 
+		
 		session.close();
-		return user;
+		return role;
 	}
 
 }

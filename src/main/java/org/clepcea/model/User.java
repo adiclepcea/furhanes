@@ -35,6 +35,39 @@ public class User implements java.io.Serializable{
 	@Column(name="ENABLED")
 	private boolean enabled;
 	
+	@Column(name="EMAIL")
+	private String email;
+	
+	@Column(name="FIRST_NAME")
+	private String firstName;
+	
+	@Column(name="LAST_NAME")
+	private String lastName;
+	
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
 	@OneToMany
 	@JoinTable(
 			name="USERS2ROLES",

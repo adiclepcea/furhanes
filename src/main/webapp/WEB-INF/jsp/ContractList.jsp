@@ -6,7 +6,7 @@
 
 <fieldset>
 <legend>Contracts</legend>
-<div style="${supplier_id!=0?"display:none":""}">
+<div style=${supplier_id!=0?"display:none":""}>
 	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpired" ${expired?'checked':'' } > Filter expired</label>
 	<label><input type="checkbox" class="checkbox-inline" id="chkContractsExpiring" ${expiring?'checked':'' }>Filter expiring</label>
 	<label><input type="checkbox" class="checkbox-inline" id="chkContractsRunning" ${running?'checked':'' }>Filter running</label>
@@ -57,7 +57,7 @@
 		</thead>
 		<tbody>
 			<c:forEach var="contract" items="${contracts }">
-			<tr id="contract_${contract.id}" class="${contract.mustRenew()?"alert-danger":(contract.mustRenewInDays(20)?"alert-warning":(contract.isFinished()?"alert-info":"")) }">
+			<tr id="contract_${contract.id}" class=${contract.mustRenew()?"alert-danger":(contract.mustRenewInDays(20)?"alert-warning":(contract.isFinished()?"alert-info":"")) }>
 				<td class="col-sm-1">
 				<c:if test="${supplier_id==0 }">
 					${contract.supplier.name }
