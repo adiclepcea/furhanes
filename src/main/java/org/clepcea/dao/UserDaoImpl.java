@@ -2,6 +2,7 @@ package org.clepcea.dao;
 
 import java.util.List;
 
+import org.clepcea.model.Role;
 import org.clepcea.model.User;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -74,7 +75,9 @@ public class UserDaoImpl implements UserDao {
 		query.setParameter("id", id);	
 		User user = (User)query.uniqueResult(); 
 		if(user!=null){
-			user.getRoles().size();
+			for(Role role: user.getRoles()){
+				role.getRights().size();
+			}
 		}
 		session.close();
 		return user;

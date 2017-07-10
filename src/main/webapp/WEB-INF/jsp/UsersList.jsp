@@ -3,19 +3,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
-	<div>
-		<div id="userHeader"><button id="btnAddUser" class="btn btn-md btn-success" onclick="addUser()">Add user</button>
+	<div class="col-md-6">
+		<div id="userHeader">
 			<input type="text" id="add_user_name" value="" placeholder="Username"/>
 			<input type="password" id="add_user_pass" value="" placeholder="Password"/>
-			<input type="password" id="add_user_pass_confirm" value="" placeholder="Confirm password"/>
+			<input type="password" id="add_user_pass_confirm" value="" placeholder="Confirm password"/><br/>
 			<input type="text" id="add_user_email" value="" placeholder="E-mail"/>
 			<input type="text" id="add_user_firstname" value="" placeholder="First Name"/>
-			<input type="text" id="add_user_lastname" value="" placeholder="Last Name"/>			
+			<input type="text" id="add_user_lastname" value="" placeholder="Last Name"/>
+			<button id="btnAddUser" class="btn btn-md btn-success" onclick="addUser()">Add user</button>			
 		</div>
 	</div>
 	
+	<div class="col-md-6">
+		<input type="text" id="add_role_name" value="" placeholder="New Role Name"/>
+		<button id="btnAddRole"class="btn btn-md btn-success" onclick="addRole()">Add Role</button>
+	</div>
 	
-	<div class="list-group" id="usersList" >
+	<div class="col-md-12">
+	<div class="list-group col-md-6" id="usersList" >
 	
 	<c:forEach var="user"  items="${users}" >
 		<div class="list-group-item greybackground" style="overflow:auto">
@@ -58,8 +64,43 @@
 			</div>
 		</div>
 		</div>
-		
 	</c:forEach>
 	
 	</div>
-		
+	
+	<div class="list-group col-md-6" id="rolesList" >
+	
+	<c:forEach var="role"  items="${roles}" >
+		<div class="list-group-item greybackground" style="overflow:auto">
+			<span class="glyphicon glyphicon-registration-mark" style="font-size:40px;float:left;width:15%;cursor:pointer; cursor:hand"></span>
+			<div style="float:left;width:70%">
+			<h4 class="list-group-item-heading bold" 
+				data-toggle="collapse" 
+				data-target="#role_edit_${role.id}" 
+				id="role_header_${role.id}"  
+				onclick="populateRoleEdit(${role.id})"
+				style="cursor:pointer; cursor:hand">				
+				${role.name}			
+			</h4>
+			<c:forEach var="right" items="${role.rights }">
+				${right.name }
+			</c:forEach>
+			</div>
+			<button class="btn btn-md btn-danger"  style="float:right; margin:5px 0 0 0;" onclick="deleteRole(${role.id})"><span class="glyphicon glyphicon-trash"></span></button>
+			<div id="role_edit_${role.id }" class="collapse col-md-12">
+			<div>
+				<label for="role_${role.id }">Name:</label> <input type="text" id="role_${role.id }" value="${role.name }" placeholder="Role name"/>
+				<div id="role_rights_${role.id }">
+					<c:forEach var="right" items="${rights}">
+						<label for="right_${right.id }_${role.id}"><input type="checkbox" id="right_${right.id }_${role.id}" class="chkright_${role.id }"/>${right.name }</label>
+					</c:forEach>
+				</div>
+				
+				<button class="btn btn-md btn-success" onclick="saveRole(${role.id},'${role.name }')">Save</button>
+			</div>
+			</div>
+		</div>
+	</c:forEach>
+	
+	</div>
+	</div>

@@ -1,10 +1,15 @@
 package org.clepcea.model;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,6 +29,19 @@ public class Role implements java.io.Serializable{
 	@Column(name="NAME")
 	private String name;
 	
+	@OneToMany
+	@JoinTable(
+			name="ROLES2RIGHTS",
+			joinColumns = @JoinColumn(name="ROLES_ID"),
+			inverseJoinColumns = @JoinColumn(name="RIGHTS_ID"))
+	private Set<Right> rights;
+	
+	public Set<Right> getRights() {
+		return rights;
+	}
+	public void setRights(Set<Right> rights) {
+		this.rights = rights;
+	}
 	public long getId() {
 		return id;
 	}

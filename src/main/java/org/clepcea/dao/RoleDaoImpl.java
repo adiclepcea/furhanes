@@ -37,6 +37,9 @@ public class RoleDaoImpl implements RoleDao {
 		crit.addOrder(Order.asc("name"));
 		
 		List<Role> lst = crit.list();
+		for(Role r : lst ){
+			r.getRights().size();
+		}
 		
 		session.close();		
 		return lst;
@@ -61,6 +64,7 @@ public class RoleDaoImpl implements RoleDao {
 		Query query = session.createQuery("from Role where id=:id");
 		query.setParameter("id", id);	
 		Role role = (Role)query.uniqueResult(); 
+		role.getRights().size();
 		
 		session.close();
 		return role;

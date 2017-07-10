@@ -3,7 +3,9 @@ package org.clepcea.controllers;
 import java.util.List;
 
 import org.clepcea.model.PasswordEncoderImpl;
+import org.clepcea.model.Role;
 import org.clepcea.model.User;
+import org.clepcea.services.RoleService;
 import org.clepcea.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
@@ -23,6 +25,10 @@ public class UserControllerV1 {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RoleService roleService;
+
 	
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public List<User> getUsersList(ModelMap model){
@@ -54,10 +60,6 @@ public class UserControllerV1 {
 	
 	@PostMapping(value="",consumes="application/json",produces="application/json")
 	public User addUser(@RequestBody User user){
-		System.out.println(user.getFirstName());
-		System.out.println(user.getLastName());
-		System.out.println(user.getUsername());
-		System.out.println(user.getId());
 		if(user.getPass()!=null){
 			user.setPass(PasswordEncoderImpl.sha256(user.getPass()));
 		}
@@ -68,6 +70,39 @@ public class UserControllerV1 {
 	@DeleteMapping(value="/{id}")
 	public void deleteUser(@PathVariable("id") int id){
 		userService.deleteUserById(id);
+	}
+	
+	@RequestMapping(value="/roles", method=RequestMethod.GET)
+	public List<Role> getRolesList(ModelMap model){
+		
+		List<Role> lstRoles = roleService.listRoles(); 
+		
+		return lstRoles;
+	}
+	
+	@GetMapping(value="/roles/{id}")
+	public Role getRoleById(@PathVariable("id") int id){
+		return roleService.getRoleById(id);
+	}
+	
+	@RequestMapping(value="/roles/{id}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
+	public Role saveRole(@RequestBody Role role){
+		
+		if(role.getName()==null){
+			return null;
+		}
+		
+		return roleService.saveRole(role);
+	}
+	
+	@PostMapping(value="/roles",consumes="application/json",produces="application/json")
+	public Role addRole(@RequestBody Role role){
+		return roleService.saveRole(role);
+	}
+	
+	@DeleteMapping(value="/roles/{id}")
+	public void deleteRole(@PathVariable("id") int id){
+		roleService.deleteRoleById(id);
 	}
 	
 }

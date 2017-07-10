@@ -442,6 +442,146 @@
 			});
 		}
 		
+		function populateRoleEdit(id){
+			$.ajax({
+				url:"v1/users/roles/"+id,
+				type:"GET",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){
+					//roles
+					var rights = data.rights;
+					$("#chkright_"+id).attr("checked",false);
+					rights.forEach(function(right){						
+						$("#right_"+right.id+"_"+id).attr("checked",true);
+					});
+					
+					console.log(JSON.stringify(data));
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});	
+		}
+		
+		function validateRole(id){
+			var role = {};
+			role.id =  id;
+			role.name = $("#role_"+id).val();
+			if(role.name==""){
+				alert("Please choose a name for the role!");
+				$("#role_"+id).focus();
+				return false;
+			}
+			role.rights = [];
+			
+			$(".chkright_"+id).each(function(index,elem){
+				if(elem.checked){
+					var right = {};
+					right.id = parseInt(elem.id.substr(6,elem.id.indexOf("_")));
+					right.name = elem.parentElement.textContent.trim();
+					role.rights.push(right);
+				}
+			});
+			
+			return role;
+		}
+		
+		function saveRole(id){
+			var rez = validateRole(id); 
+			if(!rez){
+				return;
+			}
+			
+			console.log(JSON.stringify(rez));
+			
+			$.ajax({
+				url:"v1/users/roles/"+id,
+				type: "PUT",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				data: JSON.stringify(rez),
+				success: function(data){
+					//alert(JSON.stringify(data));
+					showUsers();
+				},
+				error:  function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});
+		}
+		
+		function addRole(){
+			var role = {};
+			role.name = $("#add_role_name").val();
+			if(role.name==""){
+				alert("Please choose a name for the new role!");
+				$("#add_role_name").focus();
+				return;
+			}
+			role.roles=[];
+			
+			console.log(JSON.stringify(role));
+			
+			$.ajax({
+				url:"v1/users/roles",
+				type: "POST",
+				headers: {"Accept":"application/json","Content-Type": "application/json","X-CSRF-TOKEN":$("#csrf").val()},
+				data: JSON.stringify(role),
+				success: function(data){
+					//alert(JSON.stringify(data));
+					showUsers();
+				},
+				error:  function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));
+				}
+			});
+			
+		}
+		
+		function deleteRole(id){
+			if(!confirm("Are you sure you want to delete this role?")){
+				return;
+			}
+			$.ajax({
+				url:"v1/users/roles/"+id,
+				type:"DELETE",
+				headers: {"X-CSRF-TOKEN":$("#csrf").val()},
+				success: function(data){
+					//alert("Deleted");
+					showUsers();
+				},
+				error: function(err){
+					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
+						alert("Please relogin!");
+						window.location.replace(".");
+						return;
+					}else{
+						alert(err);
+					}
+					console.log(JSON.stringify(err));					
+				}
+			});
+		}
 		
 	</script>
 </body>
