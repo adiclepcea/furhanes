@@ -40,6 +40,7 @@ public class SupplierController {
 		return "SupplierForm";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS')")
 	@RequestMapping(value="/list",method=RequestMethod.GET)
 	public String filterSuppliers(ModelMap model,
 			@RequestParam(value="startFrom",  required=false) Integer startFrom,
@@ -70,6 +71,7 @@ public class SupplierController {
 		return "SupplierList";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTACTS')")
 	@RequestMapping(value="/{id}/contacts",method=RequestMethod.GET)
 	public String getContacts(ModelMap model, @PathVariable long id){
 		 model.addAttribute("contacts",supplierService.listContactsBySupplierId(id));
@@ -77,6 +79,7 @@ public class SupplierController {
 		 return "ContactList";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS')")
 	@RequestMapping(value="/{id}/contracts",method=RequestMethod.GET)
 	public String getContracts(ModelMap model, @PathVariable long id){
 		 model.addAttribute("contracts",supplierService.listContractsBySupplierId(id));

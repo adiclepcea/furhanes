@@ -158,7 +158,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}
@@ -241,7 +241,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 || err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -276,7 +276,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -306,7 +306,7 @@
 				},
 				error:  function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -406,7 +406,7 @@
 				},
 				error:  function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -431,7 +431,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -459,7 +459,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -512,7 +512,7 @@
 				},
 				error:  function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -546,7 +546,7 @@
 				},
 				error:  function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{
@@ -572,7 +572,7 @@
 				},
 				error: function(err){
 					if(err.hasOwnProperty("status") && (err.status==403 ||err.status==401)){
-						alert("Please relogin!");
+						alert("You do not have rights here. Please relogin!");
 						window.location.replace(".");
 						return;
 					}else{

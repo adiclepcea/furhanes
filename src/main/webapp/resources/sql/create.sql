@@ -122,6 +122,8 @@ insert into RIGHTS(NAME) values('ROLE_RIGHT_SUPPLIERS_W');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_PO_W');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_STOCK_W');
 insert into RIGHTS(NAME) values('ROLE_RIGHT_USERS_W');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_CONTACTS');
+insert into RIGHTS(NAME) values('ROLE_RIGHT_CONTACTS_W');
 
 
 --users2roles
@@ -203,6 +205,8 @@ Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,9);
 Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,10);
 Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,11);
 Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,12);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,13);
+Insert into ROLES2RIGHTS (ROLES_ID, RIGHTS_ID) values(1,14);
 
 --suppliers
 

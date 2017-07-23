@@ -16,6 +16,7 @@ import org.clepcea.model.Contract;
 import org.clepcea.services.ContractService;
 import org.clepcea.services.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,7 @@ public class ContractController {
 	@Autowired
 	private FileUploadService fileUploadService;
 	
-	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS_W')")
 	@RequestMapping(value="/{id}/file",method=RequestMethod.POST)
 	public Object  addScan(@RequestParam MultipartFile file,  @PathVariable long id,HttpServletResponse response) {
 		logger.info("Allocate file to contract called with "+fileUploadService.getFileExtension(file.getOriginalFilename()));			
@@ -73,6 +74,7 @@ public class ContractController {
 		return null;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS')")
 	@RequestMapping(value="{id}/download", method=RequestMethod.GET)
 	public void getScanFile(@PathVariable long id, HttpServletResponse response){
 		Contract c = contractService.getContractById(id);
@@ -96,6 +98,7 @@ public class ContractController {
 		}
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS')")
 	@RequestMapping(value="downloadContractList",method=RequestMethod.GET)
 	public void generateExcelFromList(HttpServletResponse response,
 			@RequestParam Map<String, Object> filter){
@@ -141,6 +144,7 @@ public class ContractController {
 		return passFilter;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS')")
 	@RequestMapping(value="list", method=RequestMethod.GET)
 	public String getContractList(ModelMap model,
 			@RequestParam Map<String, Object> filter){

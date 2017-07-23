@@ -8,6 +8,7 @@ import org.clepcea.model.User;
 import org.clepcea.services.RoleService;
 import org.clepcea.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +30,7 @@ public class UserControllerV1 {
 	@Autowired
 	private RoleService roleService;
 
-	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS')")
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public List<User> getUsersList(ModelMap model){
 		
@@ -38,12 +39,14 @@ public class UserControllerV1 {
 		return lstUsers;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS')")
 	@GetMapping(value="/{id}")
 	public User getUserById(@PathVariable("id") int id){
 		return userService.getUserById(id);
 		
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
 	public User saveUser(@RequestBody User user){
 		
@@ -58,6 +61,7 @@ public class UserControllerV1 {
 		return userService.saveUser(user);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@PostMapping(value="",consumes="application/json",produces="application/json")
 	public User addUser(@RequestBody User user){
 		if(user.getPass()!=null){
@@ -67,11 +71,13 @@ public class UserControllerV1 {
 	}
 	
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@DeleteMapping(value="/{id}")
 	public void deleteUser(@PathVariable("id") int id){
 		userService.deleteUserById(id);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS')")
 	@RequestMapping(value="/roles", method=RequestMethod.GET)
 	public List<Role> getRolesList(ModelMap model){
 		
@@ -80,11 +86,14 @@ public class UserControllerV1 {
 		return lstRoles;
 	}
 	
+	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS')")
 	@GetMapping(value="/roles/{id}")
 	public Role getRoleById(@PathVariable("id") int id){
 		return roleService.getRoleById(id);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@RequestMapping(value="/roles/{id}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
 	public Role saveRole(@RequestBody Role role){
 		
@@ -95,11 +104,13 @@ public class UserControllerV1 {
 		return roleService.saveRole(role);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@PostMapping(value="/roles",consumes="application/json",produces="application/json")
 	public Role addRole(@RequestBody Role role){
 		return roleService.saveRole(role);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS_W')")
 	@DeleteMapping(value="/roles/{id}")
 	public void deleteRole(@PathVariable("id") int id){
 		roleService.deleteRoleById(id);

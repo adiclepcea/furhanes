@@ -13,6 +13,7 @@ import org.clepcea.model.Contract;
 import org.clepcea.model.Supplier;
 import org.clepcea.services.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +31,7 @@ public class SuppliersControllerV1 {
 	@Autowired
 	private SupplierService supplierService;
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS')")
 	@RequestMapping(value="/filter",method=RequestMethod.GET, produces="application/json")
 	@ResponseBody
 	public List<Supplier> getSupplierList(@RequestParam(value="name",  required=false) String supplierName){
@@ -43,6 +45,7 @@ public class SuppliersControllerV1 {
 		return supplierService.listSuppliers(0, 50, filter);
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W')")
 	@RequestMapping(value="/", method=RequestMethod.POST, consumes="application/json",produces="application/json")
 	@ResponseBody
 	public Supplier saveSupplier(@RequestBody Supplier supplier){
@@ -51,11 +54,13 @@ public class SuppliersControllerV1 {
 		return supplier;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS')")
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
 	public String getSupplier(HttpSession session, @PathVariable long id){
 		return "";
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W')")
 	@RequestMapping(value="/{id}",method=RequestMethod.DELETE)
 	public Object deleteSupplier(@PathVariable long id,HttpServletResponse response){
 		logger.info("v1-Delete supplier called");
@@ -64,6 +69,7 @@ public class SuppliersControllerV1 {
 		return null;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W')")
 	@RequestMapping(value="/{id}",method=RequestMethod.PUT)
 	@ResponseBody
 	public Supplier modifySupplier(@RequestBody Supplier supplier, @PathVariable long id){
@@ -72,6 +78,7 @@ public class SuppliersControllerV1 {
 		return supplier;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W') and hasRole('ROLE_RIGHT_CONTACTS_W')")
 	@RequestMapping(value="/{id}/contacts",method=RequestMethod.POST)
 	public Object  addContact(@RequestBody Contact contact,  @PathVariable long id,HttpServletResponse response){
 		logger.info("v1-Add contact to supplier called");
@@ -80,6 +87,7 @@ public class SuppliersControllerV1 {
 		return null;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W') and hasRole('ROLE_RIGHT_CONTACTS_W')")
 	@RequestMapping(value="/{id}/contracts",method=RequestMethod.POST)
 	public Object  addContract(@RequestBody Contract contract,  @PathVariable long id,HttpServletResponse response){
 		logger.info("v1-Add contract to supplier called");

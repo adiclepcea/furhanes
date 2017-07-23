@@ -9,6 +9,7 @@ import org.clepcea.services.RightService;
 import org.clepcea.services.RoleService;
 import org.clepcea.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class UsersController {
 	@Autowired
 	private RightService rightService;
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_USERS')")
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public String getUsersList(ModelMap model){
 		

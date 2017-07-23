@@ -11,6 +11,7 @@ import org.clepcea.model.Contract;
 import org.clepcea.services.ContractService;
 import org.clepcea.services.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,7 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 	@Autowired
 	private FileUploadService fileUploadService;
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS')")
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	@ResponseBody
 	public Object getContract(@PathVariable long id, HttpServletResponse response){
@@ -39,6 +41,7 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		return c;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS_W')")
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public Object deleteContract(@PathVariable long id, HttpServletResponse response){
 		logger.info("deleteContract Called");
@@ -48,6 +51,7 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 		return null;
 	}
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS_W')")
 	@RequestMapping(value="/{id}", method=RequestMethod.PUT,consumes="application/json",produces="application/json")
 	@ResponseBody
 	public Object saveContract(@RequestBody Contract contract, HttpServletResponse response){
@@ -69,6 +73,7 @@ private static final Log logger = LogFactory.getLog(ContractController.class);
 	}
 	
 	
+	@PreAuthorize("hasRole('ROLE_RIGHT_CONTRACTS_W')")
 	@RequestMapping(value="/{id}/file",method=RequestMethod.DELETE)
 	public Object  deleteScan(@PathVariable long id,HttpServletResponse response){
 		logger.info("Delete  contract file called");		
