@@ -344,3 +344,5 @@ END!!
 SET TERM ; !!
 
 
+Alter table suppliers add created timestamp default current_timestamp;
+Update suppliers set created=dateadd(id minute to CURRENT_TIMESTAMP);

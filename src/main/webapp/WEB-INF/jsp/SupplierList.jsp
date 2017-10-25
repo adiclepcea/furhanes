@@ -7,6 +7,27 @@
 		<div id="supplierHeader"><button id="btnAddSupplier" class="btn btn-md btn-success" onclick="addSupplier()">Add supplier</button>
 			<input type="text" id="supplier_filter" value="${filter }"/>
 			<button id="btnFilter" class="btn btn-md btn-info" onclick="filterSuppliers()"><span class="glyphicon glyphicon-search"></span></button>
+			<span style="background-color:#f5f5f0; margin-right: 10px; padding:4px; border: 1px solid lightgray">
+				<span><i>Name</i></span>
+				<button class="btn btn-sm btn-info" onclick='$("#orderBy").val("name");$("#orderAsc").val("true");filterSuppliers()'>
+					<span class="glyphicon glyphicon-arrow-up" style="font-size:10px"></span>
+				</button>
+				<button class="btn btn-sm btn-info" onclick='$("#orderBy").val("name");$("#orderAsc").val("false");filterSuppliers()'>
+					<span class="glyphicon glyphicon-arrow-down" style="font-size:10px"></span>
+				</button>
+			</span>
+			<span style="background-color:#f5f5f0; padding:4px; border: 1px solid lightgray">
+				<span><i>Created</i></span>
+				<button class="btn btn-sm btn-info" onclick='$("#orderBy").val("created");$("#orderAsc").val("true");filterSuppliers()'>
+					<span class="glyphicon glyphicon-arrow-up" style="font-size:10px"></span>
+				</button>
+				<button class="btn btn-sm btn-info" onclick='$("#orderBy").val("created");$("#orderAsc").val("false");filterSuppliers()'>
+					<span class="glyphicon glyphicon-arrow-down" style="font-size:10px"></span>
+				</button>
+				<input type="hidden" id="orderByCreated" value=""/>
+			</span>
+			<input type="hidden" id="orderBy" value=""/>
+			<input type="hidden" id="orderAsc" value=""/>
 		</div>
 		<button id="btnCancelAddSupplier" class="btn btn-md btn-warning" onclick="closeAddSupplier()" style="display:none">Close add supplier</button>		
 		<div>

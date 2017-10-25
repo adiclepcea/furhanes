@@ -45,7 +45,9 @@ public class SupplierController {
 	public String filterSuppliers(ModelMap model,
 			@RequestParam(value="startFrom",  required=false) Integer startFrom,
 			@RequestParam(value="count",  required=false) Integer count,
-			@RequestParam(value="name", required=false) String name){
+			@RequestParam(value="name", required=false) String name,
+			@RequestParam(value="order", required=false) String order,
+			@RequestParam(value="asc", required=false) String asc){
 		
 		logger.info("list suppliers called ");
 		
@@ -57,14 +59,16 @@ public class SupplierController {
 			count = 0;
 		}
 		
+		System.out.println("Asc = "+asc+"; order = "+ order);
+		
 		model.addAttribute("request_count",count);
 		if(name!=null){
 			HashMap<String, Object> filter = new HashMap<>();
 			filter.put("name", name);
-			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, filter));
+			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, filter, order, asc!=null && asc.equals("true")));
 			model.addAttribute("filter",name);
 		}else{
-			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null));
+			model.addAttribute("suppliers", supplierService.listSuppliers(startFrom, count, null, order, asc!=null && asc.equals("true")));
 			model.addAttribute("filter","");
 		}
 		

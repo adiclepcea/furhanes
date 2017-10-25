@@ -44,8 +44,12 @@ public class SupplierDaoImpl implements SupplierDao {
 
 	@Override
 	@Transactional
-	public List<Supplier> list(int start, int count,HashMap<String, Object> filter) {
+	public List<Supplier> list(int start, int count,HashMap<String, Object> filter, String order, boolean asc) {
 		Session session = sessionFactory.openSession();
+		
+		if (order==null){
+			order = "name";
+		}
 		
 		System.out.println(String.format("Count=%d, Start=%d",count, start));
 		
@@ -54,7 +58,11 @@ public class SupplierDaoImpl implements SupplierDao {
 		if(filter!=null){
 			crit.add(Restrictions.ilike("name", "%"+filter.get("name").toString()+"%"));
 		}
-		crit.addOrder(Order.asc("name"));
+		if(asc){
+			crit.addOrder(Order.asc(order));
+		}else{
+			crit.addOrder(Order.desc(order));
+		}
 		if(count>0){
 			crit.setMaxResults(count);
 			crit.setFirstResult(start);

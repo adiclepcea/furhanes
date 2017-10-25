@@ -10,7 +10,7 @@ import org.clepcea.model.Supplier;
 public interface SupplierService {
 	
 	public void saveSupplier(Supplier supplier);
-	public List<Supplier> listSuppliers(int start, int count, HashMap<String, Object> filter);
+	public List<Supplier> listSuppliers(int start, int count, HashMap<String, Object> filter, String order, boolean asc);
 	public void deleteSupplierById(long id);
 	public Supplier getSupplierById(long id);
 	public List<Contact> listContactsBySupplierId(long id);

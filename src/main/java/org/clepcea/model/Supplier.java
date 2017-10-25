@@ -1,5 +1,6 @@
 package org.clepcea.model;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -27,6 +28,8 @@ public class Supplier implements java.io.Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private long id;
 	
+	private Date created;
+
 	private String name, cui, address,j,bank,iban,swift,phone,fax,mail;
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="supplier")
@@ -37,6 +40,14 @@ public class Supplier implements java.io.Serializable{
 	
 	public List<Contract> getContracts() {
 		return contracts;
+	}
+	
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 	
 	public void setContracts(List<Contract> contracts) {

@@ -42,7 +42,7 @@ public class SuppliersControllerV1 {
 			filter.put("name", supplierName);
 		}
 		
-		return supplierService.listSuppliers(0, 50, filter);
+		return supplierService.listSuppliers(0, 50, filter,null,true);
 	}
 	
 	@PreAuthorize("hasRole('ROLE_RIGHT_SUPPLIERS_W')")

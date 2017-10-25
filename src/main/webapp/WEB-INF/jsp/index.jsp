@@ -336,7 +336,7 @@
 				return false;
 			}
 			user.username = $("#add_user_name").val();
-			if($("#add_user_pass_confirm_"+id).val() == $("#add_user_pass").val()){
+			if($("#add_user_pass_confirm").val() == $("#add_user_pass").val()){
 				user.pass = $("#add_user_pass").val();
 			}else{
 				user.pass = null;

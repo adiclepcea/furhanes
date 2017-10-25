@@ -13,16 +13,26 @@ function incrementSupplierPos(){
 			if(!keepIndex){
 				startPositionSupplier = 0;
 			}
+			if($("#orderBy").val()){
+				showSuppliersList($("#supplier_filter").val(), $("#orderBy").val(),$("#orderAsc").val());
+				return;
+			}
 			showSuppliersList($("#supplier_filter").val());
 		}
 		
-		function showSuppliersList(name){
+		function showSuppliersList(name, orderBy, orderAsc){
+			
 			passData = {}
 			passData.startFrom = startPositionSupplier;
 			passData.count = countPositionsSupplier;
 			if(name){
 				passData.name = name;
 			}
+			if(orderBy){
+				passData.order = orderBy;
+				passData.asc = (orderAsc && orderAsc=="true")?"true":"false";
+			}
+			console.log(JSON.stringify(passData));
 			$.ajax({
 				url:"suppliers/list",
 				data: passData,
@@ -67,23 +77,61 @@ function incrementSupplierPos(){
 		function populateSupplierEdit(id){
 			//if the element is not shown yet, then populate it
 			if(!$("#supplier_edit_"+id).is(":visible")){
-				$("#supplier_edit_"+id).html("<img src="+"<spring:url value='/resources/images/Loading_icon.gif'/>"+"/>");
-				$.ajax({
-					url:"suppliers/input?id="+id,
-					error:function(err){
-						if(err.hasOwnProperty("status")){
-							processError("supplier_edit_"+id,err);				
-						}else{
-							alert("Error requesting supplier data:\r\n"+err);
-						}
-					},
-					success:function(data,  textStatus,  xhr){						
-						$("#supplier_edit_"+id).html(data);
-						$("#supplier_msg_"+id).hide();
-					}
-				});
+				performPopulateSupplier(id);
 			}
 		}
+		
+		function performPopulateSupplier(id){
+			$("#supplier_edit_"+id).html("<img src="+"<spring:url value='/resources/images/Loading_icon.gif'/>"+"/>");
+			$.ajax({
+				url:"suppliers/input?id="+id,
+				error:function(err){
+					if(err.hasOwnProperty("status")){
+						processError("supplier_edit_"+id,err);				
+					}else{
+						alert("Error requesting supplier data:\r\n"+err);
+					}
+				},
+				success:function(data,  textStatus,  xhr){						
+					$("#supplier_edit_"+id).html(data);
+					$("#supplier_msg_"+id).hide();
+				}
+			});
+		}
+		
+		function disableSupplier(id){
+			$("#supplier_form_"+id+" #supplier_name").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_address").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_cui").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_j").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_mail").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_fax").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_iban").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_bank").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_swift").prop('readonly',true);
+			$("#supplier_form_"+id+" #supplier_phone").prop('readonly',true);
+			$("#saveSupplier_"+id).hide();
+			$("#cancelSupplier_"+id).hide();
+			$("#editSupplier_"+id).show();
+			performPopulateSupplier(id);
+		}
+		
+		function enableSupplier(id){
+			$("#supplier_form_"+id+" #supplier_name").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_address").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_cui").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_j").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_mail").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_fax").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_iban").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_bank").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_swift").prop('readonly',false);
+			$("#supplier_form_"+id+" #supplier_phone").prop('readonly',false);
+			$("#saveSupplier_"+id).show();
+			$("#cancelSupplier_"+id).show();
+			$("#editSupplier_"+id).hide();
+		}
+		
 		function saveSupplier(id){
 			$("#supplier_form_"+id+" #supplier_name_group").removeClass("has-error");
 			var supplier={};
